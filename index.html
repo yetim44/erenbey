@@ -2,488 +2,391 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Tazı Yarışı Tahmin Asistanı (Statik)</title>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Tazı Yarışı Tahmin Asistanı (Tekrarsız)</title>
   <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <style>
-    body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background: #f8fafc; color:#0f172a; margin:0; }
-    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
-    .card { background: rgba(255,255,255,0.85); backdrop-filter: blur(6px); border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; box-shadow: 0 2px 10px rgba(2,6,23,0.04); }
-    h1 { font-size: 24px; font-weight: 800; margin: 0 0 8px; }
-    h2 { font-size: 18px; font-weight: 700; margin: 0 0 12px; }
-    .grid { display: grid; gap: 12px; }
-    .grid-6 { grid-template-columns: repeat(6,minmax(0,1fr)); }
-    .grid-2 { grid-template-columns: repeat(2,minmax(0,1fr)); }
-    .label { font-size: 12px; color:#334155; display:block; margin-bottom: 4px; }
-    input[type="text"] { width: 100%; padding: 10px 12px; border:1px solid #cbd5e1; border-radius: 12px; outline: none; }
-    input[type="text"]:focus { border-color:#94a3b8; box-shadow: 0 0 0 2px #cbd5e180; }
-    table { width:100%; border-collapse: collapse; font-size: 14px; }
-    th, td { padding: 8px; border-bottom: 1px solid #e2e8f0; text-align: left; }
-    thead th { position: sticky; top: 0; background: #f1f5f9; }
-    .muted { color:#475569; font-size: 14px; }
-    .note { color:#64748b; font-size: 12px; }
-    .btn { background:#0f172a; color:#fff; border:0; border-radius:12px; padding:10px 14px; cursor:pointer; }
-    textarea { width:100%; height:230px; border:1px solid #cbd5e1; border-radius:12px; padding:12px; background: rgba(255,255,255,0.85); }
+    :root{--bg:#f8fafc;--fg:#0f172a;--muted:#475569;--border:#e2e8f0;--note:#64748b;--card:rgba(255,255,255,.85)}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    .wrap{max-width:1100px;margin:0 auto;padding:20px}
+    h1{font-size:24px;font-weight:800;margin:0 0 10px}
+    h2{font-size:18px;font-weight:700;margin:0 0 12px}
+    h3,h4{margin:6px 0}
+    .card{background:var(--card);backdrop-filter:blur(6px);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(2,6,23,.04);margin-bottom:14px}
+    .grid{display:grid;gap:12px}
+    .g6{grid-template-columns:repeat(6,minmax(0,1fr))} .g3{grid-template-columns:repeat(3,minmax(0,1fr))} .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+    @media (max-width:900px){.g6{grid-template-columns:repeat(3,1fr)}.g3,.g2{grid-template-columns:1fr}}
+    label{font-size:12px;color:#334155;display:block;margin-bottom:4px}
+    input[type=text]{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;outline:0}
+    input[type=text]:focus{border-color:#94a3b8;box-shadow:0 0 0 2px #cbd5e180}
+    input[type=file]{font-size:14px}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th,td{padding:8px;border-bottom:1px solid var(--border);text-align:left}
+    thead th{position:sticky;top:0;background:#f1f5f9}
+    .muted{color:var(--muted)} .note{color:var(--note);font-size:12px}
+    textarea{width:100%;height:230px;border:1px solid #cbd5e1;border-radius:12px;padding:12px;background:var(--card)}
+    .btn{background:#0f172a;color:#fff;border:0;border-radius:12px;padding:10px 14px;cursor:pointer}
+    .row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+    .pill{display:inline-block;font-size:11px;padding:4px 8px;border:1px solid var(--border);border-radius:999px;color:var(--note)}
   </style>
 </head>
 <body>
-  <div class="container">
-    <div id="root"></div>
+  <div class="wrap">
+    <h1>Tazı Yarışı Tahmin Asistanı (Excel’e Sadık – <span class="pill">Tekrarsız</span>)</h1>
+
+    <div class="card">
+      <h2>1) Excel’i Yükle (Geçmiş Veriler)</h2>
+      <div class="row">
+        <input id="excel" type="file" accept=".xlsx,.xls"/>
+        <div class="note" style="white-space:pre-wrap">Excel beklenen sütunlar (başlıklar esnek):
+YARIŞ NO | 1.TAZININ ORANI | 2.TAZININ ORANI | 3.TAZININ ORANI | 4.TAZININ ORANI | 5.TAZININ ORANI | 6.TAZININ ORANI | KAZANAN 1 | KAZANAN 2 | GELEN ORAN</div>
+      </div>
+      <p id="status" class="muted" style="margin-top:8px"></p>
+    </div>
+
+    <div class="card">
+      <h2>2) Yeni Yarış – 6 Tazının Oranlarını Gir</h2>
+      <div class="grid g6" id="oddsInputs"></div>
+      <p id="entered" class="muted" style="margin-top:8px"></p>
+    </div>
+
+    <div class="card">
+      <h2>3) Geçmişte Bu Oranlar Verildi mi? (Excel’e Göre)</h2>
+      <div class="grid g2">
+        <div>
+          <h3>Birebir Aynı (Sıra Dahil)</h3>
+          <div id="exactBox" class="muted">Önce oranları gir.</div>
+        </div>
+        <div>
+          <h3>Sıra Önemsiz (Aynı Dağılım)</h3>
+          <div id="unorderedBox" class="muted">Önce oranları gir.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>4) Tahminler – 3’lü CFC (3 Kombinasyon x 3 Tip, Tekrarsız)</h2>
+      <div id="cfc3" class="grid g3"></div>
+    </div>
+
+    <div class="card">
+      <h2>5) Tahminler – 4’lü CFC (3 Kombinasyon x 3 Tip, Tekrarsız)</h2>
+      <div id="cfc4" class="grid g3"></div>
+    </div>
+
+    <div class="card">
+      <h2>6) Kupon Çıktısı (Kopyala–Yapıştır, Tekrarsız)</h2>
+      <div id="couponBox"></div>
+    </div>
+
+    <p class="note" style="text-align:center">Not: Geçmiş eşleşme bulunamazsa sıralama düşük orandan yükseğe göre (favori öncelikli) yapılır.</p>
   </div>
 
-  <!-- React / ReactDOM (UMD) + Babel for in-browser JSX -->
+  <!-- React/DOM + Babel + XLSX (UMD) -->
   <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js" crossorigin></script>
-  <!-- XLSX UMD -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
   <script type="text/babel">
-    const { useMemo, useState } = React;
+    const {useState,useMemo,useEffect} = React;
 
-    const Section = ({ title, children }) => (
-      <div className="card" style={{ marginBottom: 16 }}>
-        <h2>{title}</h2>
-        {children}
-      </div>
-    );
-
-    const Label = ({ children }) => (
-      <label className="label">{children}</label>
-    );
-
-    function parseNumberLike(v){
-      if (v === undefined || v === null) return null;
-      if (typeof v === "number") return v;
-      if (typeof v === "string") {
-        const s = v.replace(/,/g, ".").replace(/\s+/g, "").trim();
+    // ------- Utilities -------
+    const parseNumberLike = (v)=>{
+      if(v==null) return null;
+      if(typeof v==="number") return v;
+      if(typeof v==="string"){
+        const s = v.replace(/,/g,".").replace(/\s+/g,"").trim();
         const n = Number(s);
-        return isNaN(n) ? null : n;
+        return isNaN(n)?null:n;
       }
       return null;
-    }
+    };
+    const normalizeOdds = (arr)=> arr.map(x=> x==null?NaN:Number(x.toFixed(2)));
+    const arraysEqual = (a,b)=> a.length===b.length && a.every((v,i)=>v===b[i]);
+    const sortedCopy = (a)=> [...a].sort((x,y)=>x-y);
+    const oddsToLabel = (odds)=> odds.map(o=> isNaN(o)?"-":o.toFixed(2)).join(" / ");
+    const comboLabel = (combo,currentOdds)=>{
+      const parts = combo.map(r=> currentOdds[r-1]);
+      return `${combo.join("x")} (${parts.map(p=> (p??NaN).toFixed(2)).join(" / ")})`;
+    };
+    const uniqueCombos = (arr)=>{
+      const seen=new Set(); const out=[];
+      for(const c of arr){ const k=c.join("-"); if(!seen.has(k)){ seen.add(k); out.push(c); } }
+      return out;
+    };
 
-    function normalizeOdds(arr){
-      return arr.map(x => (x == null ? NaN : Number(x.toFixed(2))));
-    }
-
-    function arraysEqual(a,b){ if(a.length!==b.length) return false; for(let i=0;i<a.length;i++) if(a[i]!==b[i]) return false; return true; }
-    function sortedCopy(a){ return [...a].sort((x,y)=>x-y); }
-
-    function readHistoryFromSheet(sheet){
-      const rows = XLSX.utils.sheet_to_json(sheet, { header:1, raw:false });
-      if (!rows.length) return [];
-      const header = rows[0].map(h => (h==null ? "" : String(h)));
-      const alias = {
-        raceNo: ["YARIŞ NO","Yaris No","Race","RACE","RACE NO","RACE_ID","RACE NO."],
-        o1: ["1.TAZININ ORANI","1 TAZI","1","O1","1. ORAN","Runner 1"],
-        o2: ["2.TAZININ ORANI","2 TAZI","2","O2","2. ORAN","Runner 2"],
-        o3: ["3.TAZININ ORANI","3 TAZI","3","O3","3. ORAN","Runner 3"],
-        o4: ["4.TAZININ ORANI","4 TAZI","4","O4","4. ORAN","Runner 4"],
-        o5: ["5.TAZININ ORANI","5 TAZI","5","O5","5. ORAN","Runner 5"],
-        o6: ["6.TAZININ ORANI","6 TAZI","6","O6","6. ORAN","Runner 6"],
-        w1: ["KAZANAN 1","1.GELEN","Winner 1","W1"],
-        w2: ["KAZANAN 2","2.GELEN","Winner 2","W2"],
-        payout: ["GELEN ORAN","Sonuç Oran","Result","Payout","Return"],
+    const readHistoryFromSheet = (sheet)=>{
+      const rows = XLSX.utils.sheet_to_json(sheet,{header:1,raw:false});
+      if(!rows.length) return [];
+      const header = rows[0].map(h=> (h==null?"":String(h)));
+      const aliases = {
+        raceNo:["YARIŞ NO","Yaris No","Race","RACE","RACE NO","RACE_ID","RACE NO."],
+        o1:["1.TAZININ ORANI","1 TAZI","1","O1","1. ORAN","Runner 1"],
+        o2:["2.TAZININ ORANI","2 TAZI","2","O2","2. ORAN","Runner 2"],
+        o3:["3.TAZININ ORANI","3 TAZI","3","O3","3. ORAN","Runner 3"],
+        o4:["4.TAZININ ORANI","4 TAZI","4","O4","4. ORAN","Runner 4"],
+        o5:["5.TAZININ ORANI","5 TAZI","5","O5","5. ORAN","Runner 5"],
+        o6:["6.TAZININ ORANI","6 TAZI","6","O6","6. ORAN","Runner 6"],
+        w1:["KAZANAN 1","1.GELEN","Winner 1","W1"],
+        w2:["KAZANAN 2","2.GELEN","Winner 2","W2"],
+        payout:["GELEN ORAN","Sonuç Oran","Result","Payout","Return"],
       };
-      const lower = header.map(c => String(c||"").toLowerCase().trim());
-      const findKey = (targets)=>{
-        for(const t of targets){
-          const i = lower.indexOf(t.toLowerCase());
-          if(i!==-1) return i;
-        }
-        return -1;
-      };
-      let idx = {
-        raceNo: findKey(alias.raceNo),
-        o1: findKey(alias.o1),
-        o2: findKey(alias.o2),
-        o3: findKey(alias.o3),
-        o4: findKey(alias.o4),
-        o5: findKey(alias.o5),
-        o6: findKey(alias.o6),
-        w1: findKey(alias.w1),
-        w2: findKey(alias.w2),
-        payout: findKey(alias.payout),
+      const lower = header.map(c=> String(c||"").toLowerCase().trim());
+      const findKey = (targets)=>{ for(const t of targets){ const i=lower.indexOf(t.toLowerCase()); if(i!==-1) return i; } return -1; };
+      let idx={
+        raceNo:findKey(aliases.raceNo), o1:findKey(aliases.o1), o2:findKey(aliases.o2),
+        o3:findKey(aliases.o3), o4:findKey(aliases.o4), o5:findKey(aliases.o5), o6:findKey(aliases.o6),
+        w1:findKey(aliases.w1), w2:findKey(aliases.w2), payout:findKey(aliases.payout),
       };
       const needFallback = Object.values(idx).every(v=>v===-1) && header.length>=10;
-      if (needFallback) idx = { raceNo:0,o1:1,o2:2,o3:3,o4:4,o5:5,o6:6,w1:7,w2:8,payout:9 };
+      if(needFallback){ idx={raceNo:0,o1:1,o2:2,o3:3,o4:4,o5:5,o6:6,w1:7,w2:8,payout:9}; }
 
-      const out = [];
-      for(let r=1; r<rows.length; r++){
-        const row = rows[r]||[];
-        const odds = [idx.o1,idx.o2,idx.o3,idx.o4,idx.o5,idx.o6].map(i => i===-1 ? null : parseNumberLike(row[i]));
-        if (odds.filter(x => x!=null).length < 6) continue;
+      const out=[];
+      for(let r=1;r<rows.length;r++){
+        const row=rows[r]||[];
+        const odds=[idx.o1,idx.o2,idx.o3,idx.o4,idx.o5,idx.o6].map(i=> i===-1?null:parseNumberLike(row[i]));
+        if(odds.filter(x=>x!=null).length<6) continue;
         out.push({
-          raceNo: idx.raceNo===-1 ? r : row[idx.raceNo],
+          raceNo: idx.raceNo===-1? r : row[idx.raceNo],
           odds: normalizeOdds(odds),
-          winner1: idx.w1===-1 ? null : parseNumberLike(row[idx.w1]),
-          winner2: idx.w2===-1 ? null : parseNumberLike(row[idx.w2]),
-          resultPayout: idx.payout===-1 ? null : parseNumberLike(row[idx.payout]),
+          winner1: idx.w1===-1? null : parseNumberLike(row[idx.w1]),
+          winner2: idx.w2===-1? null : parseNumberLike(row[idx.w2]),
+          resultPayout: idx.payout===-1? null : parseNumberLike(row[idx.payout]),
           __raw: row,
         });
       }
       return out;
-    }
+    };
 
-    function oddsToLabel(odds){ return odds.map(o => (isNaN(o) ? "-" : o.toFixed(2))).join(" / "); }
-    function comboLabel(combo, currentOdds){
-      const parts = combo.map(r => currentOdds[r-1]);
-      return `${combo.join("x")} (${parts.map(p => (p ?? NaN).toFixed(2)).join(" / ")})`;
-    }
-    function uniqueCombos(arr){
-      const seen = new Set(); const out=[];
-      for(const c of arr){ const k=c.join("-"); if(!seen.has(k)){ seen.add(k); out.push(c);} }
-      return out;
-    }
-    function buildCombosByRank(R,k){
-      if(R.length < k) return { banko:[], near:[], surprise:[] };
-      const pick = (...idxs)=> idxs.slice(0,k);
-      const banko = uniqueCombos([ pick(R[0],R[1],R[2],R[3],R[4],R[5]), pick(R[0],R[2],R[1],R[3],R[4],R[5]), pick(R[1],R[0],R[2],R[3],R[4],R[5]) ]);
-      const near = uniqueCombos([ pick(R[0],R[1],R[2],R[4],R[3],R[5]), pick(R[0],R[1],R[3],R[2],R[4],R[5]), pick(R[1],R[0],R[3],R[2],R[4],R[5]) ]);
-      const surprise = uniqueCombos([ pick(R[2],R[0],R[4],R[1],R[3],R[5]), pick(R[3],R[1],R[4],R[0],R[2],R[5]), pick(R[4],R[0],R[2],R[1],R[3],R[5]) ]);
-      return { banko, near, surprise };
-    }
+    const buildCombosByRank = (R,k)=>{
+      if(R.length<k) return {banko:[],near:[],surprise:[]};
+      const pick=(...idxs)=> idxs.slice(0,k);
+      const banko = uniqueCombos([
+        pick(R[0],R[1],R[2],R[3],R[4],R[5]),
+        pick(R[0],R[2],R[1],R[3],R[4],R[5]),
+        pick(R[1],R[0],R[2],R[3],R[4],R[5]),
+      ]);
+      const near = uniqueCombos([
+        pick(R[0],R[1],R[2],R[4],R[3],R[5]),
+        pick(R[0],R[1],R[3],R[2],R[4],R[5]),
+        pick(R[1],R[0],R[3],R[2],R[4],R[5]),
+      ]);
+      const surprise = uniqueCombos([
+        pick(R[2],R[0],R[4],R[1],R[3],R[5]),
+        pick(R[3],R[1],R[4],R[0],R[2],R[5]),
+        pick(R[4],R[0],R[2],R[1],R[3],R[5]),
+      ]);
+      return {banko,near,surprise};
+    };
+
+    // Tekrarsız: BANKO → NEAR → SÜRPRİZ sırayla ilerlerken görülen kombinasyonları atla
+    const dedupeAcrossTiers = (tiers)=>{
+      const seen=new Set(); const key=(c)=>c.join("-");
+      return {
+        banko: tiers.banko.filter(c=>{const k=key(c); if(seen.has(k))return false; seen.add(k); return true;}),
+        near:  tiers.near .filter(c=>{const k=key(c); if(seen.has(k))return false; seen.add(k); return true;}),
+        surprise: tiers.surprise.filter(c=>{const k=key(c); if(seen.has(k))return false; seen.add(k); return true;}),
+      };
+    };
 
     function App(){
-      const [history, setHistory] = useState([]);
-      const [inputText, setInputText] = useState(["","","","","",""]);
-      const [currentOdds, setCurrentOdds] = useState([null,null,null,null,null,null]);
-      const [status, setStatus] = useState("");
+      const [history,setHistory]=useState([]);
+      const [currentOdds,setCurrentOdds]=useState([null,null,null,null,null,null]);
+      const [status,setStatus]=useState("");
 
-      const currentNormalized = React.useMemo(()=>{
-        if (currentOdds.some(o => o==null)) return null;
-        return normalizeOdds(currentOdds);
-      }, [currentOdds]);
-
-      const matches = React.useMemo(()=>{
-        if (!currentNormalized) return { exact:[], unordered:[] };
-        const exact = [], unordered=[];
-        const sortedCurrent = sortedCopy(currentNormalized);
-        for(const h of history){
-          if (!h.odds || h.odds.length!==6) continue;
-          const ex = arraysEqual(h.odds, currentNormalized);
-          if (ex) exact.push(h);
-          const un = arraysEqual(sortedCopy(h.odds), sortedCurrent);
-          if (un && !ex) unordered.push(h);
-        }
-        return { exact, unordered };
-      }, [currentNormalized, history]);
-
-      const runnerScores = React.useMemo(()=>{
-        const score = Array(6).fill(0);
-        const countWithin = (rows)=>{
-          if(!rows.length) return;
-          const w1c = Array(6).fill(0);
-          const w2c = Array(6).fill(0);
-          for(const r of rows){
-            if (r.winner1 && r.winner1>=1 && r.winner1<=6) w1c[r.winner1-1]++;
-            if (r.winner2 && r.winner2>=1 && r.winner2<=6) w2c[r.winner2-1]++;
-          }
-          for(let i=0;i<6;i++) score[i]+= w1c[i]*2 + w2c[i]*1;
-        };
-        countWithin(matches.exact);
-        countWithin(matches.unordered);
-        return score;
-      }, [matches]);
-
-      const rankedRunners = React.useMemo(()=> [1,2,3,4,5,6].sort((a,b)=> runnerScores[b-1]-runnerScores[a-1]), [runnerScores]);
-
-      function proposeCombosK(k){
-        const R = rankedRunners;
-        if ((runnerScores.every(s=>s===0) || R.length<k) && currentNormalized){
-          const byOdds = [1,2,3,4,5,6].sort((a,b)=>(currentNormalized[a-1]??999)-(currentNormalized[b-1]??999));
-          return buildCombosByRank(byOdds, k);
-        }
-        return buildCombosByRank(R, k);
-      }
-
-      const combos3 = React.useMemo(()=>proposeCombosK(3), [rankedRunners, currentNormalized]);
-      const combos4 = React.useMemo(()=>proposeCombosK(4), [rankedRunners, currentNormalized]);
-
-      const handleExcel = (file)=>{
-        setStatus("Yükleniyor…");
-        const reader = new FileReader();
-        reader.onload = (e)=>{
-          try{
-            const data = new Uint8Array(e.target.result);
-            const wb = XLSX.read(data, { type: "array" });
-            const first = wb.Sheets[wb.SheetNames[0]];
-            const hist = readHistoryFromSheet(first);
-            setHistory(hist);
-            setStatus(`Excel yüklendi: ${hist.length} satır okundu.`);
-          }catch(err){
-            setStatus("Excel okunamadı: " + (err && err.message ? err.message : String(err)));
-          }
-        };
-        reader.readAsArrayBuffer(file);
-      };
-
-      const sampleExplain = "Excel beklenen sütunlar (başlıklar esnek):\nYARIŞ NO | 1.TAZININ ORANI | 2.TAZININ ORANI | 3.TAZININ ORANI | 4.TAZININ ORANI | 5.TAZININ ORANI | 6.TAZININ ORANI | KAZANAN 1 | KAZANAN 2 | GELEN ORAN";
-
-      const couponText = React.useMemo(()=>{
-        if(!currentNormalized) return "";
-        const lines=[];
-        const pushTier = (title, list)=>{
-          lines.push(title);
-          list.slice(0,3).forEach((c,i)=>{
-            const label = comboLabel(c, currentNormalized);
-            lines.push(`  ${i+1}. ${label}`);
+      useEffect(()=>{
+        const cont=document.getElementById("oddsInputs");
+        cont.innerHTML="";
+        for(let i=0;i<6;i++){
+          const box=document.createElement("div");
+          const lab=document.createElement("label"); lab.textContent=(i+1)+". Tazı";
+          const inp=document.createElement("input"); inp.type="text"; inp.placeholder="ör. 4,30";
+          inp.addEventListener("input",(e)=>{
+            const v=parseNumberLike(e.target.value);
+            setCurrentOdds(prev=>{const n=[...prev]; n[i]=v; return n;});
           });
-          lines.push("");
-        };
-        lines.push("3'lü CFC");
-        pushTier("BANKO", combos3.banko);
-        pushTier("BANKOYA YAKIN", combos3.near);
-        pushTier("SÜRPRİZ", combos3.surprise);
-        lines.push("4'lü CFC");
-        pushTier("BANKO", combos4.banko);
-        pushTier("BANKOYA YAKIN", combos4.near);
-        pushTier("SÜRPRİZ", combos4.surprise);
-        return lines.join("\n");
-      }, [currentNormalized, combos3, combos4]);
-
-      const copyCoupon = async ()=>{
-        try{
-          await navigator.clipboard.writeText(couponText);
-          setStatus("Kupon metni kopyalandı.");
-          setTimeout(()=>setStatus(""), 2500);
-        }catch{
-          setStatus("Kopyalama başarısız. Metni elle seçip kopyalayabilirsin.");
-          setTimeout(()=>setStatus(""), 3000);
+          box.appendChild(lab); box.appendChild(inp); cont.appendChild(box);
         }
+      },[]);
+
+      const currentNormalized = useMemo(()=>{
+        if(currentOdds.some(o=>o==null)) return null;
+        return normalizeOdds(currentOdds);
+      },[currentOdds]);
+
+      const matches = useMemo(()=>{
+        if(!currentNormalized) return {exact:[],unordered:[]};
+        const exact=[], unordered=[];
+        const sortedCurrent=sortedCopy(currentNormalized);
+        for(const h of history){
+          if(!h.odds || h.odds.length!==6) continue;
+          const ex=arraysEqual(h.odds,currentNormalized);
+          if(ex) exact.push(h);
+          const un=arraysEqual(sortedCopy(h.odds),sortedCurrent);
+          if(un && !ex) unordered.push(h);
+        }
+        return {exact,unordered};
+      },[currentNormalized,history]);
+
+      const runnerScores = useMemo(()=>{
+        const score=Array(6).fill(0);
+        const count=(rows)=>{
+          if(!rows.length) return;
+          const w1=Array(6).fill(0), w2=Array(6).fill(0);
+          for(const r of rows){
+            if(r.winner1 && r.winner1>=1 && r.winner1<=6) w1[r.winner1-1]++;
+            if(r.winner2 && r.winner2>=1 && r.winner2<=6) w2[r.winner2-1]++;
+          }
+          for(let i=0;i<6;i++) score[i]+= w1[i]*2 + w2[i]*1;
+        };
+        count(matches.exact); count(matches.unordered);
+        return score;
+      },[matches]);
+
+      const rankedRunners = useMemo(()=>{
+        return [1,2,3,4,5,6].sort((a,b)=> runnerScores[b-1]-runnerScores[a-1]);
+      },[runnerScores]);
+
+      const proposeCombosK = (k)=>{
+        const R=rankedRunners;
+        if((runnerScores.every(s=>s===0) || R.length<k) && currentNormalized){
+          const byOdds=[1,2,3,4,5,6].sort((a,b)=>(currentNormalized[a-1]??999)-(currentNormalized[b-1]??999));
+          return buildCombosByRank(byOdds,k);
+        }
+        return buildCombosByRank(R,k);
       };
 
-      return (
-        <div className="grid" style={{ gap: 16 }}>
-          <h1>Tazı Yarışı Tahmin Asistanı (Statik – Build Gerekmez)</h1>
+      const tiers3 = useMemo(()=> dedupeAcrossTiers(proposeCombosK(3)), [rankedRunners,currentNormalized]);
+      const tiers4 = useMemo(()=> dedupeAcrossTiers(proposeCombosK(4)), [rankedRunners,currentNormalized]);
 
-          <Section title="1) Excel’i Yükle (Geçmiş Veriler)">
-            <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
-              <input type="file" accept=".xlsx,.xls" onChange={e=> e.target.files && handleExcel(e.target.files[0]) } />
-              <div className="note" style={{ whiteSpace:'pre-wrap' }}>{sampleExplain}</div>
-            </div>
-            <p className="muted" style={{ marginTop: 8 }}>{status}</p>
-          </Section>
+      useEffect(()=>{
+        // Girilen oran etiketi
+        const entered=document.getElementById("entered");
+        if(!currentNormalized){ entered.textContent=""; }
+        else { entered.textContent="Girilen oranlar: "+oddsToLabel(currentNormalized); }
 
-          <Section title="2) Yeni Yarış – 6 Tazının Oranlarını Gir">
-            <div className="grid grid-6">
-              {[0,1,2,3,4,5].map(i => (
-                <div key={i}>
-                  <span className="label">{i+1}. Tazı</span>
-                  <input type="text" placeholder="ör. 4,30"
-                    onChange={e=>{
-                      const raw = e.target.value;
-                      const v = parseNumberLike(raw);
-                      const next = [...currentOdds];
-                      next[i] = v;
-                      setCurrentOdds(next);
-                    }}/>
-                </div>
-              ))}
-            </div>
-            {currentNormalized && <p className="muted" style={{ marginTop: 8 }}>Girilen oranlar: {oddsToLabel(currentNormalized)}</p>}
-          </Section>
+        // Exact / Unordered tablosu
+        const exactBox=document.getElementById("exactBox");
+        const unorderedBox=document.getElementById("unorderedBox");
+        const renderTable=(rows)=>{
+          if(!rows.length) return '<p class="muted">Kayıt yok.</p>';
+          return `
+            <div style="max-height:260px;overflow:auto;border:1px solid var(--border);border-radius:12px">
+              <table><thead><tr>
+                <th>Yarış</th><th>Oranlar</th><th>1.Gelen</th><th>2.Gelen</th><th>Gelen Oran</th>
+              </tr></thead><tbody>
+              ${rows.map(r=>`
+                <tr>
+                  <td>${String(r.raceNo??"-")}</td>
+                  <td>${oddsToLabel(r.odds)}</td>
+                  <td>${r.winner1??"-"}</td>
+                  <td>${r.winner2??"-"}</td>
+                  <td>${r.resultPayout!=null? r.resultPayout.toFixed?.(2) ?? r.resultPayout : "-"}</td>
+                </tr>`).join("")}
+              </tbody></table>
+            </div>`;
+        };
+        if(!currentNormalized){ exactBox.innerHTML='<p class="muted">Önce oranları gir.</p>'; unorderedBox.innerHTML='<p class="muted">Önce oranları gir.</p>'; }
+        else { exactBox.innerHTML=renderTable(matches.exact); unorderedBox.innerHTML=renderTable(matches.unordered); }
 
-          <Section title="3) Geçmişte Bu Oranlar Verildi mi? (Excel’e Göre)">
-            {!currentNormalized ? (
-              <p className="muted">Önce 6 oranı da gir.</p>
-            ) : (
-              <div className="grid grid-2">
-                <div>
-                  <h3 style={{ margin: '6px 0' }}>Birebir Aynı (Sıra Dahil)</h3>
-                  {matches.exact.length===0 ? <p className="muted">Kayıt yok.</p> : (
-                    <div style={{ maxHeight: 260, overflow: 'auto', border: '1px solid #e2e8f0', borderRadius: 12 }}>
-                      <table>
-                        <thead>
-                          <tr><th>Yarış</th><th>Oranlar</th><th>1.Gelen</th><th>2.Gelen</th><th>Gelen Oran</th></tr>
-                        </thead>
-                        <tbody>
-                          {matches.exact.map((r,idx)=>(
-                            <tr key={idx}>
-                              <td>{String(r.raceNo ?? "-")}</td>
-                              <td>{oddsToLabel(r.odds)}</td>
-                              <td>{r.winner1 ?? "-"}</td>
-                              <td>{r.winner2 ?? "-"}</td>
-                              <td>{r.resultPayout?.toFixed(2) ?? "-"}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <h3 style={{ margin: '6px 0' }}>Sıra Önemsiz (Aynı Dağılım)</h3>
-                  {matches.unordered.length===0 ? <p className="muted">Kayıt yok.</p> : (
-                    <div style={{ maxHeight: 260, overflow: 'auto', border: '1px solid #e2e8f0', borderRadius: 12 }}>
-                      <table>
-                        <thead>
-                          <tr><th>Yarış</th><th>Oranlar</th><th>1.Gelen</th><th>2.Gelen</th><th>Gelen Oran</th></tr>
-                        </thead>
-                        <tbody>
-                          {matches.unordered.map((r,idx)=>(
-                            <tr key={idx}>
-                              <td>{String(r.raceNo ?? "-")}</td>
-                              <td>{oddsToLabel(r.odds)}</td>
-                              <td>{r.winner1 ?? "-"}</td>
-                              <td>{r.winner2 ?? "-"}</td>
-                              <td>{r.resultPayout?.toFixed(2) ?? "-"}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </Section>
+        // CFC listeleri
+        const paintTier = (root, title, list)=>{
+          root.innerHTML = `
+            <div>
+              <h4>${title}</h4>
+              <ul style="padding-left:16px;margin:0">
+                ${list.slice(0,3).map(c=> `<li>${comboLabel(c,currentNormalized)}</li>`).join("")}
+              </ul>
+            </div>`;
+        };
+        const c3=document.getElementById("cfc3");
+        const c4=document.getElementById("cfc4");
+        if(!currentNormalized){
+          c3.innerHTML='<p class="muted">Önce oranları gir.</p>';
+          c4.innerHTML='<p class="muted">Önce oranları gir.</p>';
+        }else{
+          c3.innerHTML=""; c4.innerHTML="";
+          const c3b=document.createElement("div"), c3n=document.createElement("div"), c3s=document.createElement("div");
+          c3.append(c3b,c3n,c3s);
+          paintTier(c3b,"BANKO",tiers3.banko);
+          paintTier(c3n,"BANKOYA YAKIN",tiers3.near);
+          paintTier(c3s,"SÜRPRİZ",tiers3.surprise);
 
-          <Section title="4) Tahminler – 3’lü CFC (3 Kombinasyon x 3 Tip)">
-            {!currentNormalized ? <p className="muted">Önce oranları gir.</p> : (
-              <div className="grid grid-3" style={{ display:'grid', gridTemplateColumns:'repeat(3, minmax(0,1fr))', gap: 12 }}>
-                <div>
-                  <h4 style={{ margin:'4px 0' }}>BANKO</h4>
-                  <ul style={{ paddingLeft: 16, margin:0 }}>
-                    { (uniqueCombos([
-                        [1,2,3],[1,3,2],[2,1,3] // place holders, replaced below
-                      ]), null) }
-                    {(() => {
-                      // reuse the same ranking logic to generate combos3
-                      const score = runnerScores;
-                      const R = [1,2,3,4,5,6].sort((a,b)=>score[b-1]-score[a-1]);
-                      const byOdds = [1,2,3,4,5,6].sort((a,b)=>(currentNormalized[a-1]??999)-(currentNormalized[b-1]??999));
-                      const useR = (score.every(s=>s===0) ? byOdds : R);
-                      const combos3 = buildCombosByRank(useR, 3).banko.slice(0,3);
-                      return combos3.map((c,i)=>(<li key={i}>{comboLabel(c, currentNormalized)}</li>));
-                    })()}
-                  </ul>
-                </div>
-                <div>
-                  <h4 style={{ margin:'4px 0' }}>BANKOYA YAKIN</h4>
-                  <ul style={{ paddingLeft: 16, margin:0 }}>
-                    {(() => {
-                      const score = runnerScores;
-                      const R = [1,2,3,4,5,6].sort((a,b)=>score[b-1]-score[a-1]);
-                      const byOdds = [1,2,3,4,5,6].sort((a,b)=>(currentNormalized[a-1]??999)-(currentNormalized[b-1]??999));
-                      const useR = (score.every(s=>s===0) ? byOdds : R);
-                      const combos3 = buildCombosByRank(useR, 3).near.slice(0,3);
-                      return combos3.map((c,i)=>(<li key={i}>{comboLabel(c, currentNormalized)}</li>));
-                    })()}
-                  </ul>
-                </div>
-                <div>
-                  <h4 style={{ margin:'4px 0' }}>SÜRPRİZ</h4>
-                  <ul style={{ paddingLeft: 16, margin:0 }}>
-                    {(() => {
-                      const score = runnerScores;
-                      const R = [1,2,3,4,5,6].sort((a,b)=>score[b-1]-score[a-1]);
-                      const byOdds = [1,2,3,4,5,6].sort((a,b)=>(currentNormalized[a-1]??999)-(currentNormalized[b-1]??999));
-                      const useR = (score.every(s=>s===0) ? byOdds : R);
-                      const combos3 = buildCombosByRank(useR, 3).surprise.slice(0,3);
-                      return combos3.map((c,i)=>(<li key={i}>{comboLabel(c, currentNormalized)}</li>));
-                    })()}
-                  </ul>
-                </div>
-              </div>
-            )}
-          </Section>
+          const c4b=document.createElement("div"), c4n=document.createElement("div"), c4s=document.createElement("div");
+          c4.append(c4b,c4n,c4s);
+          paintTier(c4b,"BANKO",tiers4.banko);
+          paintTier(c4n,"BANKOYA YAKIN",tiers4.near);
+          paintTier(c4s,"SÜRPRİZ",tiers4.surprise);
+        }
 
-          <Section title="5) Tahminler – 4’lü CFC (3 Kombinasyon x 3 Tip)">
-            {!currentNormalized ? <p className="muted">Önce oranları gir.</p> : (
-              <div className="grid grid-3" style={{ display:'grid', gridTemplateColumns:'repeat(3, minmax(0,1fr))', gap: 12 }}>
-                <div>
-                  <h4 style={{ margin:'4px 0' }}>BANKO</h4>
-                  <ul style={{ paddingLeft: 16, margin:0 }}>
-                    {(() => {
-                      const score = runnerScores;
-                      const R = [1,2,3,4,5,6].sort((a,b)=>score[b-1]-score[a-1]);
-                      const byOdds = [1,2,3,4,5,6].sort((a,b)=>(currentNormalized[a-1]??999)-(currentNormalized[b-1]??999));
-                      const useR = (score.every(s=>s===0) ? byOdds : R);
-                      const combos4 = buildCombosByRank(useR, 4).banko.slice(0,3);
-                      return combos4.map((c,i)=>(<li key={i}>{comboLabel(c, currentNormalized)}</li>));
-                    })()}
-                  </ul>
-                </div>
-                <div>
-                  <h4 style={{ margin:'4px 0' }}>BANKOYA YAKIN</h4>
-                  <ul style={{ paddingLeft: 16, margin:0 }}>
-                    {(() => {
-                      const score = runnerScores;
-                      const R = [1,2,3,4,5,6].sort((a,b)=>score[b-1]-score[a-1]);
-                      const byOdds = [1,2,3,4,5,6].sort((a,b)=>(currentNormalized[a-1]??999)-(currentNormalized[b-1]??999));
-                      const useR = (score.every(s=>s===0) ? byOdds : R);
-                      const combos4 = buildCombosByRank(useR, 4).near.slice(0,3);
-                      return combos4.map((c,i)=>(<li key={i}>{comboLabel(c, currentNormalized)}</li>));
-                    })()}
-                  </ul>
-                </div>
-                <div>
-                  <h4 style={{ margin:'4px 0' }}>SÜRPRİZ</h4>
-                  <ul style={{ paddingLeft: 16, margin:0 }}>
-                    {(() => {
-                      const score = runnerScores;
-                      const R = [1,2,3,4,5,6].sort((a,b)=>score[b-1]-score[a-1]);
-                      const byOdds = [1,2,3,4,5,6].sort((a,b)=>(currentNormalized[a-1]??999)-(currentNormalized[b-1]??999));
-                      const useR = (score.every(s=>s===0) ? byOdds : R);
-                      const combos4 = buildCombosByRank(useR, 4).surprise.slice(0,3);
-                      return combos4.map((c,i)=>(<li key={i}>{comboLabel(c, currentNormalized)}</li>));
-                    })()}
-                  </ul>
-                </div>
-              </div>
-            )}
-          </Section>
+        // Kupon metni
+        const couponBox=document.getElementById("couponBox");
+        if(!currentNormalized){ couponBox.innerHTML='<p class="muted">Önce oranları gir.</p>'; }
+        else{
+          const lines=[];
+          const pushTier=(title,list)=>{
+            lines.push(title);
+            list.slice(0,3).forEach((c,i)=> lines.push(`  ${i+1}. ${comboLabel(c,currentNormalized)}`));
+            lines.push("");
+          };
+          lines.push("3'lü CFC");
+          pushTier("BANKO",tiers3.banko);
+          pushTier("BANKOYA YAKIN",tiers3.near);
+          pushTier("SÜRPRİZ",tiers3.surprise);
+          lines.push("4'lü CFC");
+          pushTier("BANKO",tiers4.banko);
+          pushTier("BANKOYA YAKIN",tiers4.near);
+          pushTier("SÜRPRİZ",tiers4.surprise);
+          const txt = lines.join("\n");
+          couponBox.innerHTML = `
+            <textarea readonly>${txt}</textarea>
+            <div class="row" style="margin-top:8px">
+              <button class="btn" id="copyBtn">Metni Kopyala</button>
+              <span class="note">(tekrarsız 3’lü + 4’lü CFC)</span>
+            </div>`;
+          document.getElementById("copyBtn").onclick = async ()=>{
+            try{ await navigator.clipboard.writeText(txt);
+              setStatus("Kupon metni kopyalandı."); setTimeout(()=>setStatus(""),2000);
+            }catch{ setStatus("Kopyalama başarısız. Metni elle seçip kopyalayabilirsin."); setTimeout(()=>setStatus(""),3000); }
+          };
+        }
+      },[currentNormalized,tiers3,tiers4,matches]);
 
-          <Section title="6) Kupon Çıktısı (Kopyala–Yapıştır İçin)">
-            {!currentNormalized ? (
-              <p className="muted">Önce oranları gir.</p>
-            ) : (
-              <div>
-                <textarea readOnly value={couponText}></textarea>
-                <div style={{ display:'flex', gap: 8, alignItems:'center', marginTop: 8 }}>
-                  <button className="btn" onClick={copyCoupon}>Metni Kopyala</button>
-                  <span className="note">(3’lü + 4’lü CFC, BANKO/BANKOYA YAKIN/SÜRPRİZ)</span>
-                </div>
-              </div>
-            )}
-          </Section>
+      // Excel yükleme
+      useEffect(()=>{
+        const input=document.getElementById("excel");
+        input.onchange=(e)=>{
+          const file=e.target.files && e.target.files[0];
+          if(!file) return;
+          setStatus("Yükleniyor…");
+          const reader=new FileReader();
+          reader.onload=(ev)=>{
+            try{
+              const data=new Uint8Array(ev.target.result);
+              const wb=XLSX.read(data,{type:"array"});
+              const sheet=wb.Sheets[wb.SheetNames[0]];
+              const hist=readHistoryFromSheet(sheet);
+              setHistory(hist);
+              setStatus(`Excel yüklendi: ${hist.length} satır okundu.`);
+            }catch(err){
+              setStatus("Excel okunamadı: " + (err && err.message ? err.message : String(err)));
+            }
+          };
+          reader.readAsArrayBuffer(file);
+        };
+      },[]);
 
-          <Section title="7) Özet ve İstatistikler (Eşleşen Kayıtlara Göre)">
-            {!currentNormalized ? (
-              <p className="muted">Önce oranları gir.</p>
-            ) : (
-              <div className="grid grid-2">
-                <div>
-                  <div>Exact (Sıra Dahil): <b>{matches.exact.length}</b> kayıt</div>
-                  <div>Unordered (Sıra Önemsiz): <b>{matches.unordered.length}</b> kayıt</div>
-                </div>
-                <div>
-                  <div className="label" style={{ marginBottom: 6 }}>Tazı Skorları (W1*2 + W2*1)</div>
-                  <div className="grid" style={{ gridTemplateColumns:'repeat(6, minmax(0,1fr))', gap: 8 }}>
-                    {runnerScores.map((s,i)=>(
-                      <div key={i} className="card" style={{ padding: 10, textAlign:'center' }}>
-                        <div className="note">{i+1}. Tazı</div>
-                        <div style={{ fontWeight: 700 }}>{s}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-          </Section>
+      // Status yaz
+      useEffect(()=>{
+        document.getElementById("status").textContent=status||"";
+      },[status]);
 
-          <div className="note" style={{ textAlign:'center', padding:'16px 0' }}>
-            Statik sürüm. İstersen React kaynak projesi ile geliştirip publish edebilirsin.
-          </div>
-        </div>
-      );
+      return null;
     }
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
+    ReactDOM.createRoot(document.body.appendChild(document.createElement('div'))).render(<App/>);
   </script>
 </body>
 </html>
