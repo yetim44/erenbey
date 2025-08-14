@@ -147,6 +147,34 @@
     </div>
   </section>
 
+  <!-- GEÇMİŞTE BU ORANLAR? -->
+  <section class="grid" style="margin-top:16px">
+    <div class="panel" style="grid-column:1/-1">
+      <h2>Geçmişte Bu Oranlar Verildi mi?</h2>
+      <div class="grid" style="grid-template-columns:1fr 1fr; gap:14px">
+        <div class="tier">
+          <h3>Birebir Aynı (Sıra Dahil) — <span id="exactCount">0</span> kayıt</h3>
+          <div style="max-height:220px;overflow:auto;border:1px solid var(--border);border-radius:10px;background:#0a1526">
+            <table>
+              <thead><tr><th>Yarış</th><th>Oranlar</th><th>1.Gelen</th><th>2.Gelen</th><th>Gelen Oran</th></tr></thead>
+              <tbody id="exactBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="tier">
+          <h3>Sıra Önemsiz (Aynı Dağılım) — <span id="unordCount">0</span> kayıt</h3>
+          <div style="max-height:220px;overflow:auto;border:1px solid var(--border);border-radius:10px;background:#0a1526">
+            <table>
+              <thead><tr><th>Yarış</th><th>Oranlar</th><th>1.Gelen</th><th>2.Gelen</th><th>Gelen Oran</th></tr></thead>
+              <tbody id="unordBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <p class="note" style="margin-top:6px">“Birebir” tam sıra eşleşmelerini; “Sıra Önemsiz” aynı oranların farklı tazılara dağıldığı kayıtları gösterir.</p>
+    </div>
+  </section>
+
   <!-- ALT: EXCEL YÜKLE + SONUÇ EKLE / ARŞİV -->
   <section class="grid" style="margin-top:16px">
     <div class="panel">
@@ -168,7 +196,11 @@
       </div>
       <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:10px">
         <div><label class="note">Gelen Oran (Toplam)</label><input type="text" id="resPayout" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0a1526;color:#cbd5e1" placeholder="örn. 38,50"/></div>
-        <div class="stack" style="align-items:flex-end"><button class="btn" id="resSaveBtn">Kaydet</button><button class="btn ghost" id="resExportBtn">Arşivi İndir (.json)</button><input type="file" id="resImportFile" accept=".json"/><button class="btn ghost" id="resClearBtn">Arşivi Temizle</button></div>
+        <div class="stack" style="align-items:flex-end">
+          <button class="btn" id="resSaveBtn">Kaydet</button>
+          <button class="btn ghost" id="resExportXlsx">Arşivi İndir (.xlsx)</button>
+          <button class="btn ghost" id="resClearBtn">Arşivi Temizle</button>
+        </div>
       </div>
       <p class="note" id="resStatus" style="margin-top:6px"></p>
     </div>
@@ -296,6 +328,36 @@ const renderArchiveBox=(rows)=>{
 const paintArchive=()=> renderArchiveBox( mergeHistories(excelHistory, localResults) );
 paintArchive();
 
+/* ===== XLSX DIŞA AKTAR ===== */
+function exportArchiveXLSX(){
+  const rows = mergeHistories(excelHistory, localResults);
+  if(!rows.length){ $('resStatus').textContent='İndirilecek kayıt yok.'; return; }
+  // JSON -> Sheet: sütunları düzleştir
+  const data = rows.map(r=>{
+    const o = (r.odds||[]).map(Number);
+    return {
+      "YARIŞ NO": r.raceNo ?? "",
+      "O1": o[0] ?? "",
+      "O2": o[1] ?? "",
+      "O3": o[2] ?? "",
+      "O4": o[3] ?? "",
+      "O5": o[4] ?? "",
+      "O6": o[5] ?? "",
+      "KAZANAN 1": r.winner1 ?? "",
+      "KAZANAN 2": r.winner2 ?? "",
+      "GELEN ORAN": r.resultPayout ?? "",
+      "KAYNAK": r.__raw?.source || "excel"
+    };
+  });
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(data);
+  XLSX.utils.book_append_sheet(wb, ws, "Arsiv");
+  XLSX.writeFile(wb, "tazi-arsiv.xlsx");
+  $('resStatus').textContent='Excel indirildi: tazi-arsiv.xlsx';
+  setTimeout(()=>$('resStatus').textContent='',2000);
+}
+$('resExportXlsx').onclick=exportArchiveXLSX;
+
 $('resSaveBtn').onclick=()=>{
   const odds=[1,2,3,4,5,6].map(()=>null);
   const cur=readOdds(); if(cur) cur.forEach((v,i)=>odds[i]=v); // soldaki oranlardan kopyala
@@ -313,9 +375,33 @@ $('resSaveBtn').onclick=()=>{
   if(exists){ $('resStatus').textContent='Bu kayıt zaten var (atlandı).'; return; }
   localResults=[...localResults, row]; saveLocal(); $('resStatus').textContent='Kayıt eklendi.'; setTimeout(()=>$('resStatus').textContent='',1500); paintArchive();
 };
-$('resExportBtn').onclick=()=>{ const blob=new Blob([JSON.stringify(localResults||[],null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='tazi-arsiv.json'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); };
-$('resImportFile').onchange=(e)=>{ const f=e.target.files&&e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=(ev)=>{ try{ const arr=JSON.parse(ev.target.result); if(!Array.isArray(arr)) throw new Error('Geçersiz JSON'); const cleaned=arr.map(x=>({raceNo:x.raceNo,odds:norm((x.odds||[]).map(parseNumberLike)),winner1:parseNumberLike(x.winner1),winner2:parseNumberLike(x.winner2),resultPayout:parseNumberLike(x.resultPayout),__raw:{source:'localImport'}})).filter(r=>Array.isArray(r.odds)&&r.odds.length===6); localResults=mergeHistories([], [...localResults, ...cleaned]); saveLocal(); $('resStatus').textContent='Arşiv içe aktarıldı.'; setTimeout(()=>{$('resStatus').textContent='';},1500); paintArchive(); }catch(err){ $('resStatus').textContent='JSON okunamadı: '+(err?.message||String(err)); } }; r.readAsText(f,'utf-8'); };
 $('resClearBtn').onclick=()=>{ if(!confirm('Yerel arşivi silinsin mi?')) return; localStorage.removeItem(LS_LOCAL); localResults=[]; $('resStatus').textContent='Yerel arşiv temizlendi.'; setTimeout(()=>{$('resStatus').textContent='';},1500); paintArchive(); };
+
+/* ===== GEÇMİŞ EKRANI ===== */
+function renderMatchesUI(matches){
+  const exactBody = $('exactBody'), unordBody = $('unordBody');
+  const fmtPay = (v)=> (v==null || isNaN(v)) ? '-' : Number(v).toFixed(2);
+  $('exactCount').textContent = String(matches.exact.length || 0);
+  $('unordCount').textContent = String(matches.unordered.length || 0);
+  exactBody.innerHTML = (matches.exact||[]).map(r=>`
+    <tr>
+      <td>${String(r.raceNo ?? '-')}</td>
+      <td>${labelOdds(r.odds || [])}</td>
+      <td>${r.winner1 ?? '-'}</td>
+      <td>${r.winner2 ?? '-'}</td>
+      <td>${fmtPay(r.resultPayout)}</td>
+    </tr>
+  `).join('');
+  unordBody.innerHTML = (matches.unordered||[]).map(r=>`
+    <tr>
+      <td>${String(r.raceNo ?? '-')}</td>
+      <td>${labelOdds(r.odds || [])}</td>
+      <td>${r.winner1 ?? '-'}</td>
+      <td>${r.winner2 ?? '-'}</td>
+      <td>${fmtPay(r.resultPayout)}</td>
+    </tr>
+  `).join('');
+}
 
 /* ===== TAHMİN MOTORU ===== */
 const makeConfidence=(runnerScores,k)=>{ const w3=[.5,.3,.2], w4=[.4,.3,.2,.1], W=(k===4?w4:w3), alpha=.6; return (combo,od)=>{ const ps=combo.map(r=>{const o=od[r-1];return o&&o>0?1/o:0}); const sum=ps.reduce((a,b)=>a+b,0)||1e-9; const pN=ps.map(p=>p/sum); const rs=combo.map(r=>runnerScores[r-1]||0); const max=Math.max(1,...runnerScores); const rN=rs.map(s=>s/max); let score=100*(alpha*pN.reduce((a,p,i)=>a+W[i]*p,0)+(1-alpha)*rN.reduce((a,s,i)=>a+W[i]*s,0)); return Math.max(5,Math.min(95,score)); };};
@@ -359,6 +445,9 @@ $('makeBtn').onclick=()=>{
   const history = mergeHistories(excelHistory, localResults);
   const matches = findMatches(history, odds);
   const runnerScores = runnerScoresFromMatches(matches);
+
+  // geçmiş tabloları boya
+  renderMatchesUI(matches);
 
   // sıralama (geçmiş yoksa düşüğe öncelik)
   const R = runnerScores.every(v=>v===0) ? [1,2,3,4,5,6].sort((a,b)=>(odds[a-1]??999)-(odds[b-1]??999))
