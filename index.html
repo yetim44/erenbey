@@ -1,392 +1,398 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Tazı Yarışı Tahmin Asistanı (Tekrarsız)</title>
-  <link rel="preconnect" href="https://unpkg.com" crossorigin>
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-  <style>
-    :root{--bg:#f8fafc;--fg:#0f172a;--muted:#475569;--border:#e2e8f0;--note:#64748b;--card:rgba(255,255,255,.85)}
-    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--fg);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-    .wrap{max-width:1100px;margin:0 auto;padding:20px}
-    h1{font-size:24px;font-weight:800;margin:0 0 10px}
-    h2{font-size:18px;font-weight:700;margin:0 0 12px}
-    h3,h4{margin:6px 0}
-    .card{background:var(--card);backdrop-filter:blur(6px);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 2px 10px rgba(2,6,23,.04);margin-bottom:14px}
-    .grid{display:grid;gap:12px}
-    .g6{grid-template-columns:repeat(6,minmax(0,1fr))} .g3{grid-template-columns:repeat(3,minmax(0,1fr))} .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
-    @media (max-width:900px){.g6{grid-template-columns:repeat(3,1fr)}.g3,.g2{grid-template-columns:1fr}}
-    label{font-size:12px;color:#334155;display:block;margin-bottom:4px}
-    input[type=text]{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:12px;outline:0}
-    input[type=text]:focus{border-color:#94a3b8;box-shadow:0 0 0 2px #cbd5e180}
-    input[type=file]{font-size:14px}
-    table{width:100%;border-collapse:collapse;font-size:14px}
-    th,td{padding:8px;border-bottom:1px solid var(--border);text-align:left}
-    thead th{position:sticky;top:0;background:#f1f5f9}
-    .muted{color:var(--muted)} .note{color:var(--note);font-size:12px}
-    textarea{width:100%;height:230px;border:1px solid #cbd5e1;border-radius:12px;padding:12px;background:var(--card)}
-    .btn{background:#0f172a;color:#fff;border:0;border-radius:12px;padding:10px 14px;cursor:pointer}
-    .row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
-    .pill{display:inline-block;font-size:11px;padding:4px 8px;border:1px solid var(--border);border-radius:999px;color:var(--note)}
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Erenin İtleri – Tahmin & Arşiv (CFC Tekrarsız)</title>
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<style>
+  :root{
+    --bg:#0b1220; --ink:#e5e7eb; --muted:#94a3b8;
+    --card:#0f172a; --panel:#10233b; --border:#1f2a44; --shadow:0 12px 40px rgba(0,0,0,.35);
+    --r1:#d32f2f; --r2:#1976d2; --r3:#f8fafc; --r4:#111827; --r5:#f59e0b; --r6:#16a34a;
+  }
+  *{box-sizing:border-box} body{margin:0;background:
+    radial-gradient(80rem 60rem at -20% -20%, #122a57 0%, transparent 60%),
+    radial-gradient(60rem 50rem at 120% 0%, #1b443a 0%, transparent 60%),
+    linear-gradient(180deg, #0b1220, #0b1220);
+    color:var(--ink); font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  }
+  .wrap{max-width:1200px;margin:0 auto;padding:24px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    background:linear-gradient(135deg,#0c2a4a,#0f1e36); border:1px solid var(--border);
+    border-radius:18px; padding:16px 18px; box-shadow:var(--shadow);}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:56px;height:56px;border-radius:50%; background:conic-gradient(#10b981,#16a34a,#22c55e,#10b981);
+    display:grid;place-items:center;box-shadow:0 10px 30px rgba(16,185,129,.25)}
+  .logo svg{width:36px;height:36px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.35))}
+  h1{margin:0;font-size:26px;font-weight:900;letter-spacing:.4px}
+  .sub{color:var(--muted);font-size:13px}
+  .clock{font-weight:900;font-size:40px;text-align:right;letter-spacing:1px}
+  .board{margin-top:16px;display:grid;grid-template-columns:2.1fr 1fr;gap:16px}
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);padding:16px}
+  .mini{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px}
+  .pill{background:#0b6;color:#021;padding:6px 10px;border-radius:12px;font-weight:800;font-size:12px}
+  .grid{display:grid;gap:14px}
+  .racegrid{grid-template-columns:1fr 1fr}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .dogcard{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:12px;background:#0b1a2e;border:1px solid var(--border);border-radius:14px;padding:10px 12px}
+  .badge{width:44px;height:44px;border-radius:10px;display:grid;place-items:center;font-weight:900;font-size:20px;color:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.25);border:2px solid rgba(255,255,255,.15)}
+  .b1{background:var(--r1)} .b2{background:var(--r2)} .b3{background:var(--r3);color:#0b1220} .b4{background:var(--r4)} .b5{background:var(--r5);color:#111} .b6{background:var(--r6);color:#021}
+  .oddbox{display:flex;align-items:center;gap:8px;background:#fff;color:#0b1220;padding:8px 10px;border-radius:12px;box-shadow:inset 0 -2px 0 rgba(0,0,0,.15)}
+  .oddbox input{width:90px;max-width:100%;border:0;outline:0;font-size:22px;font-weight:900;text-align:center;background:transparent}
+  .oddbox input::placeholder{color:#94a3b8;opacity:.7}
+  h2{margin:0 0 10px;font-size:18px;font-weight:900}
+  .tier{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px}
+  .tier h3{margin:0 0 8px;font-size:15px;letter-spacing:.3px}
+  .list{list-style:none;margin:0;padding:0}
+  .chip{display:inline-flex;align-items:center;gap:6px;background:#0e1b2e;border:1px solid var(--border);border-radius:999px;padding:6px 10px;margin:5px 6px 5px 0}
+  .dot{width:14px;height:14px;border-radius:4px;border:1px solid rgba(255,255,255,.35)}
+  .note{color:var(--muted);font-size:12px}
+  .btn{background:#10b981;color:#052;border:0;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer}
+  .btn.ghost{background:transparent;color:#9fd;border:1px solid #1f9}
+  .stack{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  textarea{width:100%;height:180px;background:#0a1526;color:#cbd5e1;border:1px solid var(--border);border-radius:12px;padding:10px}
+  table{width:100%;border-collapse:collapse;font-size:14px} th,td{padding:8px;border-bottom:1px solid var(--border);text-align:left}
+  thead th{position:sticky;top:0;background:#0f1e36}
+  @media (max-width:1000px){ .board{grid-template-columns:1fr} }
+</style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>Tazı Yarışı Tahmin Asistanı (Excel’e Sadık – <span class="pill">Tekrarsız</span>)</h1>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="logo" title="Erenin İtleri">
+        <svg viewBox="0 0 64 64" fill="none" aria-hidden="true">
+          <path d="M6 42c6-8 14-12 24-12 11 0 17-5 23-10 5-4 10-6 15-5 6 1 9 7 13 12 5 6 14 6 20 8 2 1 4 2 5 4 1 3 0 5-3 5-7 1-14-1-21-2-4-1-9-2-13-2-4 0-7 3-9 6-2 4-4 7-8 9-4 2-9 1-13 0-7-2-14-5-21-7-4-1-10-1-14-5-1-2-1-3 1-5Z" fill="#fff" opacity=".95" transform="translate(-6 -18) scale(.5)"/>
+        </svg>
+      </div>
+      <div>
+        <h1>ERENİN İTLERİ</h1>
+        <div class="sub">Oran girişi • arşiv • tekrarsız CFC • güven yüzdesi</div>
+      </div>
+    </div>
+    <div class="clock" id="clock">--:--</div>
+  </header>
 
-    <div class="card">
-      <h2>1) Excel’i Yükle (Geçmiş Veriler)</h2>
-      <div class="row">
+  <section class="board">
+    <!-- SOL PANEL -->
+    <div class="panel">
+      <div class="mini">
+        <div><div class="pill">RaceID</div><div id="raceId" class="sub">—</div></div>
+        <div style="text-align:right"><div class="pill">Start</div><div id="startTime" class="sub">—</div></div>
+      </div>
+
+      <!-- PANO 1-4 / 2-5 / 3-6 -->
+      <div class="grid racegrid" style="margin-top:12px">
+        <div class="grid">
+          <div class="row">
+            <div class="dogcard"><div class="badge b1">1</div><div class="oddbox"><input id="o1" inputmode="decimal" placeholder="8,00"/></div></div>
+            <div class="dogcard"><div class="badge b4">4</div><div class="oddbox"><input id="o4" inputmode="decimal" placeholder="8,00"/></div></div>
+          </div>
+          <div class="row">
+            <div class="dogcard"><div class="badge b2">2</div><div class="oddbox"><input id="o2" inputmode="decimal" placeholder="3,70"/></div></div>
+            <div class="dogcard"><div class="badge b5">5</div><div class="oddbox"><input id="o5" inputmode="decimal" placeholder="3,70"/></div></div>
+          </div>
+          <div class="row">
+            <div class="dogcard"><div class="badge b3">3</div><div class="oddbox"><input id="o3" inputmode="decimal" placeholder="6,30"/></div></div>
+            <div class="dogcard"><div class="badge b6">6</div><div class="oddbox"><input id="o6" inputmode="decimal" placeholder="5,10"/></div></div>
+          </div>
+        </div>
+
+        <!-- AKSİYON + KUPON + UYARI -->
+        <div class="grid">
+          <div class="tier">
+            <h3>İşlemler</h3>
+            <div class="stack" style="margin:6px 0 10px">
+              <button class="btn" id="makeBtn">Tahmin Üret</button>
+              <button class="btn ghost" id="resetBtn">Oranları Sıfırla</button>
+            </div>
+            <div class="note" id="status">Oranları gir, sonra “Tahmin Üret”.</div>
+          </div>
+
+          <div class="tier">
+            <h3>Kupon Çıktısı</h3>
+            <textarea id="coupon"></textarea>
+            <div class="stack" style="margin-top:8px">
+              <button class="btn" id="copyBtn">Kopyala</button>
+              <button class="btn ghost" id="waBtn">WhatsApp</button>
+              <button class="btn ghost" id="dlBtn">.txt indir</button>
+            </div>
+          </div>
+
+          <div class="tier" id="warn" style="display:none">
+            <h3>⚠️ Bu el için uyarı</h3>
+            <div class="note" id="warnText">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAĞ PANEL: TAHMİNLER -->
+    <div class="panel">
+      <h2>3’lü CFC</h2>
+      <div class="grid" style="margin-bottom:12px">
+        <div class="tier"><h3>BANKO</h3><ul class="list" id="b3"></ul></div>
+        <div class="tier"><h3>BANKOYA YAKIN</h3><ul class="list" id="n3"></ul></div>
+        <div class="tier"><h3>SÜRPRİZ</h3><ul class="list" id="s3"></ul></div>
+      </div>
+      <h2>4’lü CFC</h2>
+      <div class="grid">
+        <div class="tier"><h3>BANKO</h3><ul class="list" id="b4"></ul></div>
+        <div class="tier"><h3>BANKOYA YAKIN</h3><ul class="list" id="n4"></ul></div>
+        <div class="tier"><h3>SÜRPRİZ</h3><ul class="list" id="s4"></ul></div>
+      </div>
+      <p class="note" style="margin-top:10px">Not: Geçmiş yoksa sıralama düşük orandan yükseğe göre. Permütasyonlar tek satıra indirilir.</p>
+    </div>
+  </section>
+
+  <!-- ALT: EXCEL YÜKLE + SONUÇ EKLE / ARŞİV -->
+  <section class="grid" style="margin-top:16px">
+    <div class="panel">
+      <h2>Excel’i Yükle (Geçmiş Veriler) — İstersen</h2>
+      <div class="stack">
         <input id="excel" type="file" accept=".xlsx,.xls"/>
-        <div class="note" style="white-space:pre-wrap">Excel beklenen sütunlar (başlıklar esnek):
-YARIŞ NO | 1.TAZININ ORANI | 2.TAZININ ORANI | 3.TAZININ ORANI | 4.TAZININ ORANI | 5.TAZININ ORANI | 6.TAZININ ORANI | KAZANAN 1 | KAZANAN 2 | GELEN ORAN</div>
+        <button id="clearExcel" class="btn ghost">Excel Verisini Temizle</button>
       </div>
-      <p id="status" class="muted" style="margin-top:8px"></p>
+      <p class="note" id="excelStatus" style="margin-top:6px">Başlıklar esnek: YARIŞ NO, 1–6 ORAN, KAZANAN1/2, GELEN ORAN.</p>
+      <div id="histPreview" class="note" style="margin-top:8px"></div>
     </div>
 
-    <div class="card">
-      <h2>2) Yeni Yarış – 6 Tazının Oranlarını Gir</h2>
-      <div class="grid g6" id="oddsInputs"></div>
-      <p id="entered" class="muted" style="margin-top:8px"></p>
-    </div>
-
-    <div class="card">
-      <h2>3) Geçmişte Bu Oranlar Verildi mi? (Excel’e Göre)</h2>
-      <div class="grid g2">
-        <div>
-          <h3>Birebir Aynı (Sıra Dahil)</h3>
-          <div id="exactBox" class="muted">Önce oranları gir.</div>
-        </div>
-        <div>
-          <h3>Sıra Önemsiz (Aynı Dağılım)</h3>
-          <div id="unorderedBox" class="muted">Önce oranları gir.</div>
-        </div>
+    <div class="panel">
+      <h2>Yarış Sonucu Ekle (Yerel Arşiv)</h2>
+      <div class="grid" style="grid-template-columns:repeat(3,1fr)">
+        <div><label class="note">Yarış No</label><input type="text" id="resRaceNo" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0a1526;color:#cbd5e1" placeholder="örn. 12"/></div>
+        <div><label class="note">1. Gelen (1..6)</label><input type="text" id="resW1" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0a1526;color:#cbd5e1" placeholder="örn. 4"/></div>
+        <div><label class="note">2. Gelen (1..6)</label><input type="text" id="resW2" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0a1526;color:#cbd5e1" placeholder="örn. 5"/></div>
       </div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:10px">
+        <div><label class="note">Gelen Oran (Toplam)</label><input type="text" id="resPayout" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0a1526;color:#cbd5e1" placeholder="örn. 38,50"/></div>
+        <div class="stack" style="align-items:flex-end"><button class="btn" id="resSaveBtn">Kaydet</button><button class="btn ghost" id="resExportBtn">Arşivi İndir (.json)</button><input type="file" id="resImportFile" accept=".json"/><button class="btn ghost" id="resClearBtn">Arşivi Temizle</button></div>
+      </div>
+      <p class="note" id="resStatus" style="margin-top:6px"></p>
     </div>
 
-    <div class="card">
-      <h2>4) Tahminler – 3’lü CFC (3 Kombinasyon x 3 Tip, Tekrarsız)</h2>
-      <div id="cfc3" class="grid g3"></div>
+    <div class="panel" style="grid-column:1/-1">
+      <h2>Birleşik Arşiv (Excel + Yerel)</h2>
+      <div id="archiveBox" class="note">Henüz kayıt yok.</div>
     </div>
+  </section>
+</div>
 
-    <div class="card">
-      <h2>5) Tahminler – 4’lü CFC (3 Kombinasyon x 3 Tip, Tekrarsız)</h2>
-      <div id="cfc4" class="grid g3"></div>
-    </div>
+<!-- Libs -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
-    <div class="card">
-      <h2>6) Kupon Çıktısı (Kopyala–Yapıştır, Tekrarsız)</h2>
-      <div id="couponBox"></div>
-    </div>
+<script>
+/* ===== KÜÇÜK YARDIMCILAR ===== */
+const $ = (id)=>document.getElementById(id);
+const trapColor=(n)=>({1:'var(--r1)',2:'var(--r2)',3:'var(--r3)',4:'var(--r4)',5:'var(--r5)',6:'var(--r6)'}[n]||'#999');
+const parseNumberLike=(v)=>{ if(v==null) return null; const s=String(v).replace(/,/g,'.').replace(/\s+/g,'').trim(); const n=Number(s); return isNaN(n)?null:n; };
+const norm=(arr)=>arr.map(x=>x==null?NaN:Number(x.toFixed(2)));
+const sorted=(a)=>[...a].sort((x,y)=>x-y);
+const eq=(a,b)=>a.length===b.length && a.every((v,i)=>v===b[i]);
+const labelOdds=(od)=>od.map(o=>isNaN(o)?'-':o.toFixed(2)).join(' / ');
+const comboText=(c,od)=> `${c.join('x')} (${c.map(r=> (od[r-1]??NaN).toFixed(2)).join(' / ')})`;
+const unique=(arr)=>{const S=new Set, out=[]; for(const c of arr){const k=c.join('-'); if(!S.has(k)){S.add(k); out.push(c);}} return out;};
+const canonicalKey=(c)=>[...c].sort((a,b)=>a-b).join('-');
+const collapseBySet=(list,od,scoreFn)=>{ const best=new Map(); for(const c of list){ const key=canonicalKey(c); const s=scoreFn(c,od); const p=best.get(key); if(!p||s>p.s) best.set(key,{c,s}); } return [...best.values()].map(x=>x.c); };
+const LS_LOCAL = "tazi_local_results_v1";
 
-    <p class="note" style="text-align:center">Not: Geçmiş eşleşme bulunamazsa sıralama düşük orandan yükseğe göre (favori öncelikli) yapılır.</p>
-  </div>
+/* ===== SAAT ===== */
+setInterval(()=>{ const d=new Date(); const p=n=>String(n).padStart(2,'0'); $('clock').textContent=`${p(d.getHours())}:${p(d.getMinutes())}`; },1000);
 
-  <!-- React/DOM + Babel + XLSX (UMD) -->
-  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js" crossorigin></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+/* ===== ORAN GİRİŞİ ===== */
+const readOdds=()=>{ const vals=[1,2,3,4,5,6].map(i=>parseNumberLike($('o'+i).value)); if(vals.some(v=>v==null)) return null; return norm(vals); };
+const saveOdds=()=>{ const vals=[1,2,3,4,5,6].map(i=>$('o'+i).value); localStorage.setItem('eren_odds', JSON.stringify(vals)); };
+const loadOdds=()=>{ try{ const raw=localStorage.getItem('eren_odds'); if(!raw) return; const vals=JSON.parse(raw); if(Array.isArray(vals)&&vals.length===6){ [1,2,3,4,5,6].forEach(i=>$('o'+i).value=vals[i-1]??''); } }catch{} };
+loadOdds(); [1,2,3,4,5,6].forEach(i=> $('o'+i).addEventListener('input',saveOdds));
+$('resetBtn').onclick=()=>{ [1,2,3,4,5,6].forEach(i=>$('o'+i).value=''); localStorage.removeItem('eren_odds'); $('status').textContent='Oranlar sıfırlandı.'; setTimeout(()=>$('status').textContent='',2000); };
 
-  <script type="text/babel">
-    const {useState,useMemo,useEffect} = React;
+/* ===== EXCEL YÜKLE (OPSİYONEL) ===== */
+let excelHistory = [];
+const readHistoryFromSheet=(sheet)=>{
+  const rows = XLSX.utils.sheet_to_json(sheet,{header:1,raw:false});
+  if(!rows.length) return [];
+  const header=rows[0].map(h=>h==null?'':String(h));
+  const lower=header.map(c=>String(c||'').toLowerCase().trim());
+  const find=(names)=>{ for(const t of names){ const i=lower.indexOf(t.toLowerCase()); if(i!==-1) return i; } return -1; };
+  const alias = {
+    raceNo:["YARIŞ NO","Yaris No","Race","RACE","RACE NO","RACE_ID","RACE NO."],
+    o1:["1.TAZININ ORANI","1 TAZI","1","O1","1. ORAN","Runner 1"],
+    o2:["2.TAZININ ORANI","2 TAZI","2","O2","2. ORAN","Runner 2"],
+    o3:["3.TAZININ ORANI","3 TAZI","3","O3","3. ORAN","Runner 3"],
+    o4:["4.TAZININ ORANI","4 TAZI","4","O4","4. ORAN","Runner 4"],
+    o5:["5.TAZININ ORANI","5 TAZI","5","O5","5. ORAN","Runner 5"],
+    o6:["6.TAZININ ORANI","6 TAZI","6","O6","6. ORAN","Runner 6"],
+    w1:["KAZANAN 1","1.GELEN","Winner 1","W1"],
+    w2:["KAZANAN 2","2.GELEN","Winner 2","W2"],
+    pay:["GELEN ORAN","Sonuç Oran","Result","Payout","Return"],
+  };
+  let idx={raceNo:find(alias.raceNo), o1:find(alias.o1), o2:find(alias.o2), o3:find(alias.o3), o4:find(alias.o4), o5:find(alias.o5), o6:find(alias.o6), w1:find(alias.w1), w2:find(alias.w2), pay:find(alias.pay)};
+  const fallback = Object.values(idx).every(v=>v===-1) && header.length>=10;
+  if(fallback){ idx={raceNo:0,o1:1,o2:2,o3:3,o4:4,o5:5,o6:6,w1:7,w2:8,pay:9}; }
+  const out=[];
+  for(let r=1;r<rows.length;r++){
+    const row=rows[r]||[];
+    const odds=[idx.o1,idx.o2,idx.o3,idx.o4,idx.o5,idx.o6].map(i=> i===-1?null:parseNumberLike(row[i]));
+    if(odds.filter(x=>x!=null).length<6) continue;
+    out.push({
+      raceNo: idx.raceNo===-1? r : row[idx.raceNo],
+      odds: norm(odds),
+      winner1: idx.w1===-1? null : parseNumberLike(row[idx.w1]),
+      winner2: idx.w2===-1? null : parseNumberLike(row[idx.w2]),
+      resultPayout: idx.pay===-1? null : parseNumberLike(row[idx.pay]),
+      __raw:{source:'excel'}
+    });
+  }
+  return out;
+};
+$('excel').onchange=(e)=>{
+  const file=e.target.files && e.target.files[0]; if(!file) return;
+  $('excelStatus').textContent='Yükleniyor…';
+  const reader=new FileReader();
+  reader.onload=(ev)=>{
+    try{
+      const wb=XLSX.read(new Uint8Array(ev.target.result),{type:'array'});
+      const sheet=wb.Sheets[wb.SheetNames[0]];
+      excelHistory = readHistoryFromSheet(sheet);
+      $('excelStatus').textContent=`Excel yüklendi: ${excelHistory.length} satır okundu.`;
+      paintArchive();
+      paintHistPreview();
+    }catch(err){ $('excelStatus').textContent='Excel okunamadı: '+(err?.message||String(err)); }
+  };
+  reader.readAsArrayBuffer(file);
+};
+$('clearExcel').onclick=()=>{ excelHistory=[]; $('excel').value=''; $('excelStatus').textContent='Excel verisi temizlendi.'; paintArchive(); paintHistPreview(); };
+const paintHistPreview=()=>{
+  const box=$('histPreview');
+  if(!excelHistory.length){ box.innerHTML=''; return; }
+  box.innerHTML = `<div style="max-height:180px;overflow:auto;border:1px solid var(--border);border-radius:10px;background:#0a1526">
+  <table><thead><tr><th>Yarış</th><th>Oranlar</th><th>1.Gelen</th><th>2.Gelen</th><th>Gelen Oran</th></tr></thead>
+  <tbody>${excelHistory.slice(0,20).map(r=>`<tr><td>${String(r.raceNo??'-')}</td><td>${labelOdds(r.odds)}</td><td>${r.winner1??'-'}</td><td>${r.winner2??'-'}</td><td>${r.resultPayout!=null?(r.resultPayout.toFixed?r.resultPayout.toFixed(2):r.resultPayout):'-'}</td></tr>`).join('')}</tbody></table></div>
+  <div class="note" style="margin-top:6px">Örnek ilk 20 satır gösterildi.</div>`;
+};
 
-    // ------- Utilities -------
-    const parseNumberLike = (v)=>{
-      if(v==null) return null;
-      if(typeof v==="number") return v;
-      if(typeof v==="string"){
-        const s = v.replace(/,/g,".").replace(/\s+/g,"").trim();
-        const n = Number(s);
-        return isNaN(n)?null:n;
-      }
-      return null;
-    };
-    const normalizeOdds = (arr)=> arr.map(x=> x==null?NaN:Number(x.toFixed(2)));
-    const arraysEqual = (a,b)=> a.length===b.length && a.every((v,i)=>v===b[i]);
-    const sortedCopy = (a)=> [...a].sort((x,y)=>x-y);
-    const oddsToLabel = (odds)=> odds.map(o=> isNaN(o)?"-":o.toFixed(2)).join(" / ");
-    const comboLabel = (combo,currentOdds)=>{
-      const parts = combo.map(r=> currentOdds[r-1]);
-      return `${combo.join("x")} (${parts.map(p=> (p??NaN).toFixed(2)).join(" / ")})`;
-    };
-    const uniqueCombos = (arr)=>{
-      const seen=new Set(); const out=[];
-      for(const c of arr){ const k=c.join("-"); if(!seen.has(k)){ seen.add(k); out.push(c); } }
-      return out;
-    };
+/* ===== YEREL ARŞİV ===== */
+let localResults = []; // kalıcı (tarayıcıda)
+const loadLocal=()=>{ try{ const raw=localStorage.getItem(LS_LOCAL); if(raw){ const arr=JSON.parse(raw); if(Array.isArray(arr)) localResults=arr; } }catch{} };
+const saveLocal=()=>{ localStorage.setItem(LS_LOCAL, JSON.stringify(localResults)); };
+loadLocal();
 
-    const readHistoryFromSheet = (sheet)=>{
-      const rows = XLSX.utils.sheet_to_json(sheet,{header:1,raw:false});
-      if(!rows.length) return [];
-      const header = rows[0].map(h=> (h==null?"":String(h)));
-      const aliases = {
-        raceNo:["YARIŞ NO","Yaris No","Race","RACE","RACE NO","RACE_ID","RACE NO."],
-        o1:["1.TAZININ ORANI","1 TAZI","1","O1","1. ORAN","Runner 1"],
-        o2:["2.TAZININ ORANI","2 TAZI","2","O2","2. ORAN","Runner 2"],
-        o3:["3.TAZININ ORANI","3 TAZI","3","O3","3. ORAN","Runner 3"],
-        o4:["4.TAZININ ORANI","4 TAZI","4","O4","4. ORAN","Runner 4"],
-        o5:["5.TAZININ ORANI","5 TAZI","5","O5","5. ORAN","Runner 5"],
-        o6:["6.TAZININ ORANI","6 TAZI","6","O6","6. ORAN","Runner 6"],
-        w1:["KAZANAN 1","1.GELEN","Winner 1","W1"],
-        w2:["KAZANAN 2","2.GELEN","Winner 2","W2"],
-        payout:["GELEN ORAN","Sonuç Oran","Result","Payout","Return"],
-      };
-      const lower = header.map(c=> String(c||"").toLowerCase().trim());
-      const findKey = (targets)=>{ for(const t of targets){ const i=lower.indexOf(t.toLowerCase()); if(i!==-1) return i; } return -1; };
-      let idx={
-        raceNo:findKey(aliases.raceNo), o1:findKey(aliases.o1), o2:findKey(aliases.o2),
-        o3:findKey(aliases.o3), o4:findKey(aliases.o4), o5:findKey(aliases.o5), o6:findKey(aliases.o6),
-        w1:findKey(aliases.w1), w2:findKey(aliases.w2), payout:findKey(aliases.payout),
-      };
-      const needFallback = Object.values(idx).every(v=>v===-1) && header.length>=10;
-      if(needFallback){ idx={raceNo:0,o1:1,o2:2,o3:3,o4:4,o5:5,o6:6,w1:7,w2:8,payout:9}; }
+const historyRowKey=(hr)=>{ const odds=(hr?.odds||[]).map(x=>isNaN(x)?'NaN':x.toFixed(2)).join('|');
+  const w1=hr?.winner1??'-', w2=hr?.winner2??'-';
+  const po=(hr?.resultPayout==null)?'-':Number(hr.resultPayout).toFixed(2);
+  return `${odds}__${w1}_${w2}_${po}`; };
 
-      const out=[];
-      for(let r=1;r<rows.length;r++){
-        const row=rows[r]||[];
-        const odds=[idx.o1,idx.o2,idx.o3,idx.o4,idx.o5,idx.o6].map(i=> i===-1?null:parseNumberLike(row[i]));
-        if(odds.filter(x=>x!=null).length<6) continue;
-        out.push({
-          raceNo: idx.raceNo===-1? r : row[idx.raceNo],
-          odds: normalizeOdds(odds),
-          winner1: idx.w1===-1? null : parseNumberLike(row[idx.w1]),
-          winner2: idx.w2===-1? null : parseNumberLike(row[idx.w2]),
-          resultPayout: idx.payout===-1? null : parseNumberLike(row[idx.payout]),
-          __raw: row,
-        });
-      }
-      return out;
-    };
+const mergeHistories=(a,b)=>{ const m=new Map(); for(const r of [...(a||[]),...(b||[])]){ if(!r||!Array.isArray(r.odds)||r.odds.length!==6) continue; const k=historyRowKey(r); if(!m.has(k)) m.set(k,r); } return [...m.values()]; };
 
-    const buildCombosByRank = (R,k)=>{
-      if(R.length<k) return {banko:[],near:[],surprise:[]};
-      const pick=(...idxs)=> idxs.slice(0,k);
-      const banko = uniqueCombos([
-        pick(R[0],R[1],R[2],R[3],R[4],R[5]),
-        pick(R[0],R[2],R[1],R[3],R[4],R[5]),
-        pick(R[1],R[0],R[2],R[3],R[4],R[5]),
-      ]);
-      const near = uniqueCombos([
-        pick(R[0],R[1],R[2],R[4],R[3],R[5]),
-        pick(R[0],R[1],R[3],R[2],R[4],R[5]),
-        pick(R[1],R[0],R[3],R[2],R[4],R[5]),
-      ]);
-      const surprise = uniqueCombos([
-        pick(R[2],R[0],R[4],R[1],R[3],R[5]),
-        pick(R[3],R[1],R[4],R[0],R[2],R[5]),
-        pick(R[4],R[0],R[2],R[1],R[3],R[5]),
-      ]);
-      return {banko,near,surprise};
-    };
+const renderArchiveBox=(rows)=>{
+  const box=$('archiveBox');
+  if(!rows.length){ box.innerHTML='Henüz kayıt yok.'; return; }
+  box.innerHTML=`<div style="max-height:260px;overflow:auto;border:1px solid var(--border);border-radius:12px;background:#0a1526">
+  <table><thead><tr><th>Yarış</th><th>Oranlar</th><th>1.Gelen</th><th>2.Gelen</th><th>Gelen Oran</th><th>Kaynak</th></tr></thead>
+  <tbody>${rows.map(r=>`<tr><td>${String(r.raceNo??'-')}</td><td>${labelOdds(r.odds)}</td><td>${r.winner1??'-'}</td><td>${r.winner2??'-'}</td><td>${r.resultPayout!=null?(r.resultPayout.toFixed?r.resultPayout.toFixed(2):r.resultPayout):'-'}</td><td>${r.__raw?.source||'excel'}</td></tr>`).join('')}</tbody></table></div>`;
+};
+const paintArchive=()=> renderArchiveBox( mergeHistories(excelHistory, localResults) );
+paintArchive();
 
-    // Tekrarsız: BANKO → NEAR → SÜRPRİZ sırayla ilerlerken görülen kombinasyonları atla
-    const dedupeAcrossTiers = (tiers)=>{
-      const seen=new Set(); const key=(c)=>c.join("-");
-      return {
-        banko: tiers.banko.filter(c=>{const k=key(c); if(seen.has(k))return false; seen.add(k); return true;}),
-        near:  tiers.near .filter(c=>{const k=key(c); if(seen.has(k))return false; seen.add(k); return true;}),
-        surprise: tiers.surprise.filter(c=>{const k=key(c); if(seen.has(k))return false; seen.add(k); return true;}),
-      };
-    };
+$('resSaveBtn').onclick=()=>{
+  const odds=[1,2,3,4,5,6].map(()=>null);
+  const cur=readOdds(); if(cur) cur.forEach((v,i)=>odds[i]=v); // soldaki oranlardan kopyala
+  if(odds.some(v=>v==null)){ $('resStatus').textContent='6 oranın da dolu olması gerekir.'; return; }
+  const row = {
+    raceNo: $('resRaceNo').value?.trim()||undefined,
+    odds: norm(odds),
+    winner1: parseNumberLike($('resW1').value),
+    winner2: parseNumberLike($('resW2').value),
+    resultPayout: parseNumberLike($('resPayout').value),
+    __raw:{source:'local'}
+  };
+  const key=historyRowKey(row);
+  const exists = mergeHistories(excelHistory, localResults).some(r=>historyRowKey(r)===key);
+  if(exists){ $('resStatus').textContent='Bu kayıt zaten var (atlandı).'; return; }
+  localResults=[...localResults, row]; saveLocal(); $('resStatus').textContent='Kayıt eklendi.'; setTimeout(()=>$('resStatus').textContent='',1500); paintArchive();
+};
+$('resExportBtn').onclick=()=>{ const blob=new Blob([JSON.stringify(localResults||[],null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='tazi-arsiv.json'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); };
+$('resImportFile').onchange=(e)=>{ const f=e.target.files&&e.target.files[0]; if(!f) return; const r=new FileReader(); r.onload=(ev)=>{ try{ const arr=JSON.parse(ev.target.result); if(!Array.isArray(arr)) throw new Error('Geçersiz JSON'); const cleaned=arr.map(x=>({raceNo:x.raceNo,odds:norm((x.odds||[]).map(parseNumberLike)),winner1:parseNumberLike(x.winner1),winner2:parseNumberLike(x.winner2),resultPayout:parseNumberLike(x.resultPayout),__raw:{source:'localImport'}})).filter(r=>Array.isArray(r.odds)&&r.odds.length===6); localResults=mergeHistories([], [...localResults, ...cleaned]); saveLocal(); $('resStatus').textContent='Arşiv içe aktarıldı.'; setTimeout(()=>{$('resStatus').textContent='';},1500); paintArchive(); }catch(err){ $('resStatus').textContent='JSON okunamadı: '+(err?.message||String(err)); } }; r.readAsText(f,'utf-8'); };
+$('resClearBtn').onclick=()=>{ if(!confirm('Yerel arşivi silinsin mi?')) return; localStorage.removeItem(LS_LOCAL); localResults=[]; $('resStatus').textContent='Yerel arşiv temizlendi.'; setTimeout(()=>{$('resStatus').textContent='';},1500); paintArchive(); };
 
-    function App(){
-      const [history,setHistory]=useState([]);
-      const [currentOdds,setCurrentOdds]=useState([null,null,null,null,null,null]);
-      const [status,setStatus]=useState("");
+/* ===== TAHMİN MOTORU ===== */
+const makeConfidence=(runnerScores,k)=>{ const w3=[.5,.3,.2], w4=[.4,.3,.2,.1], W=(k===4?w4:w3), alpha=.6; return (combo,od)=>{ const ps=combo.map(r=>{const o=od[r-1];return o&&o>0?1/o:0}); const sum=ps.reduce((a,b)=>a+b,0)||1e-9; const pN=ps.map(p=>p/sum); const rs=combo.map(r=>runnerScores[r-1]||0); const max=Math.max(1,...runnerScores); const rN=rs.map(s=>s/max); let score=100*(alpha*pN.reduce((a,p,i)=>a+W[i]*p,0)+(1-alpha)*rN.reduce((a,s,i)=>a+W[i]*s,0)); return Math.max(5,Math.min(95,score)); };};
+const byRank=(R,k)=>{ if(R.length<k) return {banko:[],near:[],surprise:[]}; const pick=(...xs)=>xs.slice(0,k);
+  const banko=unique([pick(R[0],R[1],R[2],R[3],R[4],R[5]), pick(R[0],R[2],R[1],R[3],R[4],R[5]), pick(R[1],R[0],R[2],R[3],R[4],R[5])]);
+  const near =unique([pick(R[0],R[1],R[2],R[4],R[3],R[5]), pick(R[0],R[1],R[3],R[2],R[4],R[5]), pick(R[1],R[0],R[3],R[2],R[4],R[5])]);
+  const surprise=unique([pick(R[2],R[0],R[4],R[1],R[3],R[5]), pick(R[3],R[1],R[4],R[0],R[2],R[5]), pick(R[4],R[0],R[2],R[1],R[3],R[5])]);
+  return {banko,near,surprise}; };
+const dedupeTiers=(t)=>{ const S=new Set,k=c=>c.join('-'); return {banko:t.banko.filter(c=>{const x=k(c);if(S.has(x))return false;S.add(x);return true;}), near:t.near.filter(c=>{const x=k(c);if(S.has(x))return false;S.add(x);return true;}), surprise:t.surprise.filter(c=>{const x=k(c);if(S.has(x))return false;S.add(x);return true;})}; };
 
-      useEffect(()=>{
-        const cont=document.getElementById("oddsInputs");
-        cont.innerHTML="";
-        for(let i=0;i<6;i++){
-          const box=document.createElement("div");
-          const lab=document.createElement("label"); lab.textContent=(i+1)+". Tazı";
-          const inp=document.createElement("input"); inp.type="text"; inp.placeholder="ör. 4,30";
-          inp.addEventListener("input",(e)=>{
-            const v=parseNumberLike(e.target.value);
-            setCurrentOdds(prev=>{const n=[...prev]; n[i]=v; return n;});
-          });
-          box.appendChild(lab); box.appendChild(inp); cont.appendChild(box);
-        }
-      },[]);
+const runnerScoresFromMatches=(matches)=>{ const s=Array(6).fill(0); const count=(rows)=>{ if(!rows.length) return; const w1=Array(6).fill(0), w2=Array(6).fill(0); for(const r of rows){ if(r.winner1>=1&&r.winner1<=6) w1[r.winner1-1]++; if(r.winner2>=1&&r.winner2<=6) w2[r.winner2-1]++; } for(let i=0;i<6;i++) s[i]+= w1[i]*2 + w2[i]*1; }; count(matches.exact); count(matches.unordered); return s; };
 
-      const currentNormalized = useMemo(()=>{
-        if(currentOdds.some(o=>o==null)) return null;
-        return normalizeOdds(currentOdds);
-      },[currentOdds]);
+const findMatches=(history, currentOdds)=>{
+  const exact=[], unordered=[]; const sortedCur=sorted(currentOdds);
+  for(const h of history){
+    if(!h.odds || h.odds.length!==6) continue;
+    const ex = eq(h.odds, currentOdds);
+    if(ex) exact.push(h);
+    const un = eq(sorted(h.odds), sortedCur);
+    if(un && !ex) unordered.push(h);
+  }
+  return {exact, unordered};
+};
 
-      const matches = useMemo(()=>{
-        if(!currentNormalized) return {exact:[],unordered:[]};
-        const exact=[], unordered=[];
-        const sortedCurrent=sortedCopy(currentNormalized);
-        for(const h of history){
-          if(!h.odds || h.odds.length!==6) continue;
-          const ex=arraysEqual(h.odds,currentNormalized);
-          if(ex) exact.push(h);
-          const un=arraysEqual(sortedCopy(h.odds),sortedCurrent);
-          if(un && !ex) unordered.push(h);
-        }
-        return {exact,unordered};
-      },[currentNormalized,history]);
+const paintTier=(rootId, list, k, conf, odds)=>{
+  const root=$(rootId); root.innerHTML='';
+  list.slice(0,3).forEach(c=>{
+    const li=document.createElement('li'); li.className='chip';
+    c.forEach(n=>{ const d=document.createElement('span'); d.className='dot'; d.style.background=trapColor(n); if(n===3) d.style.border='1px solid #334155'; li.appendChild(d); });
+    const txt=document.createElement('span'); txt.innerHTML = `${comboText(c,odds)} <span class="note" style="margin-left:6px">Güven: ${Math.round(conf(c,odds))}%</span>`;
+    li.appendChild(txt); root.appendChild(li);
+  });
+  if(list.length===0) root.innerHTML='<span class="note">Yeterli kombinasyon yok.</span>';
+};
 
-      const runnerScores = useMemo(()=>{
-        const score=Array(6).fill(0);
-        const count=(rows)=>{
-          if(!rows.length) return;
-          const w1=Array(6).fill(0), w2=Array(6).fill(0);
-          for(const r of rows){
-            if(r.winner1 && r.winner1>=1 && r.winner1<=6) w1[r.winner1-1]++;
-            if(r.winner2 && r.winner2>=1 && r.winner2<=6) w2[r.winner2-1]++;
-          }
-          for(let i=0;i<6;i++) score[i]+= w1[i]*2 + w2[i]*1;
-        };
-        count(matches.exact); count(matches.unordered);
-        return score;
-      },[matches]);
+$('makeBtn').onclick=()=>{
+  const odds=readOdds();
+  if(!odds){ $('status').textContent='Lütfen 6 oranı da gir (virgül veya nokta olur).'; return; }
+  $('status').textContent='Hesaplandı.';
 
-      const rankedRunners = useMemo(()=>{
-        return [1,2,3,4,5,6].sort((a,b)=> runnerScores[b-1]-runnerScores[a-1]);
-      },[runnerScores]);
+  const history = mergeHistories(excelHistory, localResults);
+  const matches = findMatches(history, odds);
+  const runnerScores = runnerScoresFromMatches(matches);
 
-      const proposeCombosK = (k)=>{
-        const R=rankedRunners;
-        if((runnerScores.every(s=>s===0) || R.length<k) && currentNormalized){
-          const byOdds=[1,2,3,4,5,6].sort((a,b)=>(currentNormalized[a-1]??999)-(currentNormalized[b-1]??999));
-          return buildCombosByRank(byOdds,k);
-        }
-        return buildCombosByRank(R,k);
-      };
+  // sıralama (geçmiş yoksa düşüğe öncelik)
+  const R = runnerScores.every(v=>v===0) ? [1,2,3,4,5,6].sort((a,b)=>(odds[a-1]??999)-(odds[b-1]??999))
+                                         : [1,2,3,4,5,6].sort((a,b)=>runnerScores[b-1]-runnerScores[a-1]);
 
-      const tiers3 = useMemo(()=> dedupeAcrossTiers(proposeCombosK(3)), [rankedRunners,currentNormalized]);
-      const tiers4 = useMemo(()=> dedupeAcrossTiers(proposeCombosK(4)), [rankedRunners,currentNormalized]);
+  const c3raw=byRank(R,3), c4raw=byRank(R,4);
+  const conf3=makeConfidence(runnerScores,3), conf4=makeConfidence(runnerScores,4);
 
-      useEffect(()=>{
-        // Girilen oran etiketi
-        const entered=document.getElementById("entered");
-        if(!currentNormalized){ entered.textContent=""; }
-        else { entered.textContent="Girilen oranlar: "+oddsToLabel(currentNormalized); }
+  const t3=dedupeTiers({banko:collapseBySet(c3raw.banko,odds,conf3), near:collapseBySet(c3raw.near,odds,conf3), surprise:collapseBySet(c3raw.surprise,odds,conf3)});
+  const t4=dedupeTiers({banko:collapseBySet(c4raw.banko,odds,conf4), near:collapseBySet(c4raw.near,odds,conf4), surprise:collapseBySet(c4raw.surprise,odds,conf4)});
 
-        // Exact / Unordered tablosu
-        const exactBox=document.getElementById("exactBox");
-        const unorderedBox=document.getElementById("unorderedBox");
-        const renderTable=(rows)=>{
-          if(!rows.length) return '<p class="muted">Kayıt yok.</p>';
-          return `
-            <div style="max-height:260px;overflow:auto;border:1px solid var(--border);border-radius:12px">
-              <table><thead><tr>
-                <th>Yarış</th><th>Oranlar</th><th>1.Gelen</th><th>2.Gelen</th><th>Gelen Oran</th>
-              </tr></thead><tbody>
-              ${rows.map(r=>`
-                <tr>
-                  <td>${String(r.raceNo??"-")}</td>
-                  <td>${oddsToLabel(r.odds)}</td>
-                  <td>${r.winner1??"-"}</td>
-                  <td>${r.winner2??"-"}</td>
-                  <td>${r.resultPayout!=null? r.resultPayout.toFixed?.(2) ?? r.resultPayout : "-"}</td>
-                </tr>`).join("")}
-              </tbody></table>
-            </div>`;
-        };
-        if(!currentNormalized){ exactBox.innerHTML='<p class="muted">Önce oranları gir.</p>'; unorderedBox.innerHTML='<p class="muted">Önce oranları gir.</p>'; }
-        else { exactBox.innerHTML=renderTable(matches.exact); unorderedBox.innerHTML=renderTable(matches.unordered); }
+  // uyarı
+  const warns=[];
+  if(t3.banko[0] && Math.round(conf3(t3.banko[0],odds))<55) warns.push('BANKO (3’lü) güveni düşük görünüyor (<%55).');
+  const matchCount=(matches.exact?.length||0)+(matches.unordered?.length||0);
+  if(matchCount<3) warns.push('Geçmişte bu dağılım için az kayıt var.');
+  if(warns.length){ $('warnText').textContent='• '+warns.join(' • '); $('warn').style.display='block'; } else $('warn').style.display='none';
 
-        // CFC listeleri
-        const paintTier = (root, title, list)=>{
-          root.innerHTML = `
-            <div>
-              <h4>${title}</h4>
-              <ul style="padding-left:16px;margin:0">
-                ${list.slice(0,3).map(c=> `<li>${comboLabel(c,currentNormalized)}</li>`).join("")}
-              </ul>
-            </div>`;
-        };
-        const c3=document.getElementById("cfc3");
-        const c4=document.getElementById("cfc4");
-        if(!currentNormalized){
-          c3.innerHTML='<p class="muted">Önce oranları gir.</p>';
-          c4.innerHTML='<p class="muted">Önce oranları gir.</p>';
-        }else{
-          c3.innerHTML=""; c4.innerHTML="";
-          const c3b=document.createElement("div"), c3n=document.createElement("div"), c3s=document.createElement("div");
-          c3.append(c3b,c3n,c3s);
-          paintTier(c3b,"BANKO",tiers3.banko);
-          paintTier(c3n,"BANKOYA YAKIN",tiers3.near);
-          paintTier(c3s,"SÜRPRİZ",tiers3.surprise);
+  // çiz
+  paintTier('b3',t3.banko,3,conf3,odds); paintTier('n3',t3.near,3,conf3,odds); paintTier('s3',t3.surprise,3,conf3,odds);
+  paintTier('b4',t4.banko,4,conf4,odds); paintTier('n4',t4.near,4,conf4,odds); paintTier('s4',t4.surprise,4,conf4,odds);
 
-          const c4b=document.createElement("div"), c4n=document.createElement("div"), c4s=document.createElement("div");
-          c4.append(c4b,c4n,c4s);
-          paintTier(c4b,"BANKO",tiers4.banko);
-          paintTier(c4n,"BANKOYA YAKIN",tiers4.near);
-          paintTier(c4s,"SÜRPRİZ",tiers4.surprise);
-        }
+  // kupon
+  const lines=[];
+  const add=(title,arr,k,conf)=>{ lines.push(title); arr.slice(0,3).forEach((c,i)=> lines.push(`  ${i+1}. ${comboText(c,odds)} (Güven: ${Math.round(conf(c,odds))}%)`)); lines.push(''); };
+  lines.push("3'lü CFC"); add('BANKO',t3.banko,3,conf3); add('BANKOYA YAKIN',t3.near,3,conf3); add('SÜRPRİZ',t3.surprise,3,conf3);
+  lines.push("4'lü CFC"); add('BANKO',t4.banko,4,conf4); add('BANKOYA YAKIN',t4.near,4,conf4); add('SÜRPRİZ',t4.surprise,4,conf4);
+  $('coupon').value=lines.join('\n');
+};
 
-        // Kupon metni
-        const couponBox=document.getElementById("couponBox");
-        if(!currentNormalized){ couponBox.innerHTML='<p class="muted">Önce oranları gir.</p>'; }
-        else{
-          const lines=[];
-          const pushTier=(title,list)=>{
-            lines.push(title);
-            list.slice(0,3).forEach((c,i)=> lines.push(`  ${i+1}. ${comboLabel(c,currentNormalized)}`));
-            lines.push("");
-          };
-          lines.push("3'lü CFC");
-          pushTier("BANKO",tiers3.banko);
-          pushTier("BANKOYA YAKIN",tiers3.near);
-          pushTier("SÜRPRİZ",tiers3.surprise);
-          lines.push("4'lü CFC");
-          pushTier("BANKO",tiers4.banko);
-          pushTier("BANKOYA YAKIN",tiers4.near);
-          pushTier("SÜRPRİZ",tiers4.surprise);
-          const txt = lines.join("\n");
-          couponBox.innerHTML = `
-            <textarea readonly>${txt}</textarea>
-            <div class="row" style="margin-top:8px">
-              <button class="btn" id="copyBtn">Metni Kopyala</button>
-              <span class="note">(tekrarsız 3’lü + 4’lü CFC)</span>
-            </div>`;
-          document.getElementById("copyBtn").onclick = async ()=>{
-            try{ await navigator.clipboard.writeText(txt);
-              setStatus("Kupon metni kopyalandı."); setTimeout(()=>setStatus(""),2000);
-            }catch{ setStatus("Kopyalama başarısız. Metni elle seçip kopyalayabilirsin."); setTimeout(()=>setStatus(""),3000); }
-          };
-        }
-      },[currentNormalized,tiers3,tiers4,matches]);
-
-      // Excel yükleme
-      useEffect(()=>{
-        const input=document.getElementById("excel");
-        input.onchange=(e)=>{
-          const file=e.target.files && e.target.files[0];
-          if(!file) return;
-          setStatus("Yükleniyor…");
-          const reader=new FileReader();
-          reader.onload=(ev)=>{
-            try{
-              const data=new Uint8Array(ev.target.result);
-              const wb=XLSX.read(data,{type:"array"});
-              const sheet=wb.Sheets[wb.SheetNames[0]];
-              const hist=readHistoryFromSheet(sheet);
-              setHistory(hist);
-              setStatus(`Excel yüklendi: ${hist.length} satır okundu.`);
-            }catch(err){
-              setStatus("Excel okunamadı: " + (err && err.message ? err.message : String(err)));
-            }
-          };
-          reader.readAsArrayBuffer(file);
-        };
-      },[]);
-
-      // Status yaz
-      useEffect(()=>{
-        document.getElementById("status").textContent=status||"";
-      },[status]);
-
-      return null;
-    }
-
-    ReactDOM.createRoot(document.body.appendChild(document.createElement('div'))).render(<App/>);
-  </script>
+/* Kupon aksiyonları */
+$('copyBtn').onclick=async()=>{ try{ await navigator.clipboard.writeText($('coupon').value||''); $('status').textContent='Kupon kopyalandı.'; setTimeout(()=>$('status').textContent='',1500);}catch{ $('status').textContent='Elle kopyalayabilirsin.'; setTimeout(()=>$('status').textContent='',2000);} };
+$('waBtn').onclick=()=> window.open('https://wa.me/?text='+encodeURIComponent($('coupon').value||''), '_blank');
+$('dlBtn').onclick=()=>{ const blob=new Blob([$('coupon').value||''],{type:'text/plain;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='erenin-itleri-kupon.txt'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},0); };
+</script>
 </body>
 </html>
